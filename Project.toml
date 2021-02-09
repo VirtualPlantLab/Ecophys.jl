@@ -3,6 +3,9 @@ uuid = "19467474-d12d-47c9-939f-3e50fbfd93ad"
 authors = ["Alejandro Morales <alejandro.moralessierra@wur.nl> and contributors"]
 version = "0.1.0"
 
+[deps]
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+
 [compat]
 julia = "1"
 

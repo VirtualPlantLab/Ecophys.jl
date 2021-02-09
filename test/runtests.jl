@@ -1,6 +1,6 @@
 using Ecophys
 using Test
 
-@testset "Ecophys.jl" begin
-    # Write your tests here.
+@testset "Photosynthesis" begin
+    include("Photosynthesis/test_components.jl")
 end

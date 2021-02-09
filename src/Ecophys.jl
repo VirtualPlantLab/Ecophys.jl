@@ -1,5 +1,6 @@
 module Ecophys
 
-# Write your package code here.
+# Photosynthesis models
+include("Photosynthesis/Photosynthesis.jl")
 
 end
