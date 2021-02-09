@@ -8,9 +8,9 @@ PH = Ecophys.Photosynthesis
 @test PH.GasConstant(Float64) == 8.314
 @test PH.GasConstant(Float32) == 8.314f0
 @test PH.GasConstant(Unitful.Quantity) == 8.314J/K/mol
-@test PH.BaseTemp(Float64) == 298.15
-@test PH.BaseTemp(Float32) == 298.15f0
-@test PH.BaseTemp(Unitful.Quantity) == 298.15K
+@test PH.Tref(Float64) == 298.15
+@test PH.Tref(Float32) == 298.15f0
+@test PH.Tref(Unitful.Quantity) == 298.15K
 
 # Arrhenius temperature response
 @test PH.arrhenius(1.0, 65330.0, 298.15) == 1.0
