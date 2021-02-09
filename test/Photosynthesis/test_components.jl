@@ -1,6 +1,6 @@
 using Test
 import Ecophys
-import Unitful: K, J, K, mol
+import Unitful: K, J, K, mol, kPa
 import Unitful
 PH = Ecophys.Photosynthesis
 
@@ -25,3 +25,13 @@ PH = Ecophys.Photosynthesis
 @test PH.peaked(1.0mol, 26900.0J/mol, 2e5J/mol, 298.15K, 298.15K) == 1.0mol
 @test PH.peaked(1.0, 26900.0, 2e5, 298.15, 298.15 + 10.0) ≈ 0.524803439463303
 @test PH.peaked(1.0, 26900.0, 2e5, 298.15, 298.15 - 10.0) ≈ 0.785398095155038
+
+# Saturated vapour pressure
+@test PH.es(298.15) ≈ 3.167688063635486
+@test PH.es(298.15K) ≈ 3.167688063635486kPa
+@test PH.es(35.86) == 0.0
+@test PH.es(35.86K) == 0.0kPa
+
+# VPD
+@test PH.VPD(298.15, 1.0) == 0.0
+@test PH.VPD(298.15, 0.0) == PH.es(298.15)
