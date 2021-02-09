@@ -34,7 +34,7 @@ function arrhenius(p₂₅, Hₐ, Tₖ)
     p₂₅*exp((Tₖ - T₂₅)*Hₐ/(T₂₅*R*Tₖ))
 end
 
-# Increase with temperature with an optimum, normalized at 25 °C (Equation 10.5)
+# Increase with temperature with an optimum, normalized at optimum (Equation 10.5)
 function peaked(pₒₚₜ, Hₐ, Hd, Tₒₚₜ, Tₖ)
     mode = typeof(Hₐ)
     R = GasConstant(mode) 
@@ -43,6 +43,12 @@ function peaked(pₒₚₜ, Hₐ, Hd, Tₒₚₜ, Tₖ)
     pₒₚₜ*Hd*eterm1/(Hd - Hₐ*(1.0 - eterm2))
 end
 
+# Calculate temperature optimum from entropy and other parameters
+function Topt(Ha, Hd, S)
+    mode = typeof(Ha)
+    R = GasConstant(mode) 
+    Hd/(S - R*log(Ha/(Hd - Ha)))
+end
 
 ###############################################################################
 ################################ VPD responses ################################
