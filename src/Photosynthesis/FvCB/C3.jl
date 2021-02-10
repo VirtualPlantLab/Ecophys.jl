@@ -1,4 +1,5 @@
-abstract type C3 end
+abstract type FvCB end
+abstract type C3 <: FvCB end
 
 # Data structure to store all the C3 parameters without units
 mutable struct C3F{T <: Real} <: C3
@@ -9,7 +10,7 @@ mutable struct C3F{T <: Real} <: C3
     Kmc25::T # Km for CO2 at 25 C (μmol/mol)
     E_Kmc::T # Activation energy of Kmc (J/mol)
     # Michaelis-Menten constants oxygenation
-    Kmo25::T # Km for O2 at 25 C (mmol/mol)
+    Kmo25::T # Km for O2 at 25 C (umol/mol)
     E_Kmo::T # Activation energy of Kmo (J/mol)
     # Rubisco activity
     Vcmax25::T # Maximum rate of carboxylation at 25 C (μmol/m2/s)
@@ -20,12 +21,12 @@ mutable struct C3F{T <: Real} <: C3
     Jmax25::T # Maximum rate of electron transport (μmol/m2/s)
     E_Jmax::T # Activation energy Jmax (J/mol)
     D_Jmax::T # Deactivation energy of Jmax (J/mol)
-    Topt_Jmax::T # Entropy coefficient of Jmax (J/mol/K)
+    Topt_Jmax::T # Optimal temperature for Jmax (K)
     # Triose phosphate utilisation
     TPU25::T # Maximum rate of triose phosphate utilisation (μmol/m2/s)
     E_TPU::T # Activation energy TPU (J/mol)
     D_TPU::T # Deactivation energy of TPU (J/mol)
-    Topt_TPU::T # Entropy coefficient of TPU (J/mol/K)
+    Topt_TPU::T # Optimal temperature for TOU (K)
     # Respiration
     Rd25::T # Respiration rate at 25 C (μmol/m2/s)
     E_Rd::T # Activation energy of Rd (J/mol)
@@ -33,7 +34,7 @@ mutable struct C3F{T <: Real} <: C3
     gm25::T # Mesophyll conductance at 25 C (mol/m2/s)
     E_gm::T # Activation energy of gm (J/mol)
     D_gm::T # Deactivation energy of gm (J/mol)
-    Topt_gm::T # Entropy coefficient of gm (J/mol/K)
+    Topt_gm::T # Optimal temperature for gm (K)
     # Stomatal conductance
     gso::T # Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s)
     a1::T # Empirical parameter in gs formula
@@ -63,7 +64,7 @@ mutable struct C3Q{T <: Real} <: C3
     Kmc25::Quantity{T, dimension(μmol/mol)} # Km for CO2 at 25 C (μmol/mol)
     E_Kmc::Quantity{T, dimension(J/mol)} # Activation energy of Kmc (J/mol)
     # Michaelis-Menten constants oxygenation
-    Kmo25::Quantity{T, dimension(μmol/mol)} # Km for O2 at 25 C (mmol/mol)
+    Kmo25::Quantity{T, dimension(μmol/mol)} # Km for O2 at 25 C (umol/mol)
     E_Kmo::Quantity{T, dimension(J/mol)} # Activation energy of Kmo (J/mol)
     # Rubisco activity
     Vcmax25::Quantity{T, dimension(μmol/m^2/s)} # Maximum rate of carboxylation at 25 C (μmol/m2/s)
@@ -140,13 +141,13 @@ function A_gs(p::C3, PAR, RH, Tleaf, Ca, O2, gb)
     # Photosynthesis limited by Rubisco
     x1_c = Vcmax # μmol/m2/s
     x2_c = Kmc*(1 + O2/Kmo) # μmol/mol
-    Ac = solveA(gm, gb, p.gso, fvpd, x2_c, x1_c, gamma_star, Rd, Ca) # μmol/m2/s
+    Ac = solveAC3(gm, gb, p.gso, fvpd, x2_c, x1_c, gamma_star, Rd, Ca) # μmol/m2/s
 
     # Limitation by electron transport
     J = (p.alpha*PAR + Jmax - sqrt((p.alpha*PAR + Jmax)^2.0 - 4.0*p.theta*p.alpha*Jmax*PAR))/(2*p.theta) # μmol/m2/s
     x1_j = J/4.0 # μmol/m2/s
     x2_j = 2*gamma_star # μmol/mol
-    Aj = solveA(gm, gb, p.gso, fvpd, x2_j, x1_j, gamma_star, Rd, Ca) # μmol/m2/s
+    Aj = solveAC3(gm, gb, p.gso, fvpd, x2_j, x1_j, gamma_star, Rd, Ca) # μmol/m2/s
 
     # Limitation by TPU
     x1_p = 3.0*TPU # μmol/m2/s
@@ -165,7 +166,7 @@ end
 
 
 # Analytical solution of cubic equation due to coupling of A, gb, gs and gm
-function solveA(gm, gb, gso, fvpd, x2, x1, gamma_star, Rd, Ca)
+function solveAC3(gm, gb, gso, fvpd, x2, x1, gamma_star, Rd, Ca)
     a = gso*(x2 + gamma_star) + (gso/gm + fvpd)*(x1 - Rd)
     b = Ca*(x1 - Rd) - gamma_star*x1 - Rd*x2
     c = Ca + x2 + (x1 - Rd)*(1/gm + 1/gb)
@@ -185,6 +186,6 @@ function solvegs(gso, A, Ca, Ci_star, Rd, fvpd, gb)
     a = Ca - A/gb - Ci_star
     b = -A - Ca*gso + gso*Ci_star - (A + Rd)*fvpd
     c = A*gso
-    (-b - sqrt(b*b - 4*a*c))/(2*a)
+    A = (-b - sqrt(b*b - 4*a*c))/(2*a)
   end
   

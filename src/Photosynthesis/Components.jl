@@ -20,6 +20,16 @@ Tb(::Type{T}) where T <: Unitful.Quantity = 35.86K
 es0(::Type{T}) where T <: Real = T(0.61078)
 es0(::Type{T}) where T <: Unitful.Quantity = 0.61078kPa
 
+
+# 0 umol/m2/s
+zeroflux(::Type{T}) where T <: Real = T(0.0) # μmol/m^2/s
+zeroflux(::Type{T}) where T <: Unitful.Quantity = 0.0μmol/m^2/s
+
+# 0 umol/mol
+zeroconc(::Type{T}) where T <: Real = T(0.0) # μmol/mol
+zeroconc(::Type{T}) where T <: Unitful.Quantity = 0.0μmol/mol
+
+
 ###############################################################################
 ########################### Temperature responses #############################
 ###############################################################################

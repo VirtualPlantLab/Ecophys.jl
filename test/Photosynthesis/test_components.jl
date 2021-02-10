@@ -1,6 +1,6 @@
 using Test
 import Ecophys
-import Unitful: K, J, K, mol, kPa, Quantity
+import Unitful: K, J, K, mol, kPa, Quantity, μmol, m, s
 import Unitful
 PH = Ecophys.Photosynthesis
 
@@ -39,3 +39,13 @@ PH = Ecophys.Photosynthesis
 # VPD
 @test PH.VPD(298.15, 1.0) == 0.0
 @test PH.VPD(298.15, 0.0) == PH.es(298.15)
+
+# zeros with units
+@test PH.zeroflux(Float64) == 0.0
+@test PH.zeroflux(Float32) == 0f0
+@test PH.zeroflux(Quantity) == 0.0μmol/m^2/s
+
+# molar fractions with units
+@test PH.zeroconc(Float64) == 0.0
+@test PH.zeroconc(Float32) == 0f0
+@test PH.zeroconc(Quantity) == 0.0mol/mol
