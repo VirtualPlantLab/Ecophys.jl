@@ -1,4 +1,4 @@
-abstract type FvCB end
+abstract type FvCB <: Ags end
 abstract type C3 <: FvCB end
 
 # Data structure to store all the C3 parameters without units
@@ -17,7 +17,11 @@ mutable struct C3F{T <: Real} <: C3
     E_Vcmax::T # Activation energy of Vcmax (J/mol)
     # Electron transport
     theta::T # Curvature parameter
-    alpha::T # Initial slope
+    Phi2::T # Low-light PSII quantum yield
+    sigma2::T # Partitioning of excitation between PSII and PSI
+    beta::T # Leaf absorptance of PAR
+    fcyc::T #  Fraction of electrons at PSI that follow cyclic transport around PSI
+    fpseudo::T # Fraction of electrons at PSI that are used by alternative electron sinks
     Jmax25::T # Maximum rate of electron transport (μmol/m2/s)
     E_Jmax::T # Activation energy Jmax (J/mol)
     D_Jmax::T # Deactivation energy of Jmax (J/mol)
@@ -43,15 +47,16 @@ end
 
 function C3F(; Sco25 = 2800.0, E_Sco = -24.46e3, Kmc25 = 270.0, E_Kmc = 80.99e3,
                     Kmo25 = 165.0e3, E_Kmo = 23.72e3, Vcmax25 = 120.0, E_Vcmax = 65.33e3,
-                    theta = 0.7, alpha = 0.25, Jmax25 = 230.0, E_Jmax = 30.0e3,
-                    D_Jmax = 200.0e3, Topt_Jmax = 300.5, TPU25 = 12.0, E_TPU = 53.1e3,
-                    D_TPU = 20.18e3, Topt_TPU = 306.5, Rd25 = 1.2, E_Rd = 46.39e3,
-                    gm25 = 0.4, E_gm = 49.6e3, D_gm = 437.4e3, Topt_gm = 308.6,
-                    gso = 0.01, a1 = 0.85, b1 = 0.14)
+                    theta = 0.7, Phi2 = 0.82, sigma2 = 0.5, beta = 0.85, fcyc = 0.1, 
+                    fpseudo = 0.05, Jmax25 = 230.0, E_Jmax = 30.0e3, D_Jmax = 200.0e3, 
+                    Topt_Jmax = 300.5, TPU25 = 12.0, E_TPU = 53.1e3, D_TPU = 20.18e3, 
+                    Topt_TPU = 306.5, Rd25 = 1.2, E_Rd = 46.39e3, gm25 = 0.4, 
+                    E_gm = 49.6e3, D_gm = 437.4e3, Topt_gm = 308.6, gso = 0.01, 
+                    a1 = 0.85, b1 = 0.14e-3)
 
-    C3F(Sco25, E_Sco, Kmc25, E_Kmc, Kmo25, E_Kmo, Vcmax25, E_Vcmax,
-        theta, alpha, Jmax25, E_Jmax, D_Jmax, Topt_Jmax, TPU25, E_TPU,
-        D_TPU, Topt_TPU, Rd25, E_Rd, gm25, E_gm, D_gm, Topt_gm, gso, a1, b1)
+    C3F(Sco25, E_Sco, Kmc25, E_Kmc, Kmo25, E_Kmo, Vcmax25, E_Vcmax, theta, Phi2, sigma2,
+     beta, fcyc, fpseudo, Jmax25, E_Jmax, D_Jmax, Topt_Jmax, TPU25, E_TPU, D_TPU, Topt_TPU, 
+     Rd25, E_Rd, gm25, E_gm, D_gm, Topt_gm, gso, a1, b1)
 end
 
 
@@ -71,7 +76,11 @@ mutable struct C3Q{T <: Real} <: C3
     E_Vcmax::Quantity{T, dimension(J/mol)} # Activation energy of Vcmax (J/mol)
     # Electron transport
     theta::T # Curvature parameter
-    alpha::T # Initial slope
+    Phi2::T # Low-light PSII quantum yield
+    sigma2::T # Partitioning of excitation between PSII and PSI
+    beta::T # Leaf absorptance of PAR
+    fcyc::T #  Fraction of electrons at PSI that follow cyclic transport around PSI
+    fpseudo::T # Fraction of electrons at PSI that are used by alternative electron sinks
     Jmax25::Quantity{T, dimension(μmol/m^2/s)} # Maximum rate of electron transport (μmol/m2/s)
     E_Jmax::Quantity{T, dimension(J/mol)} # Activation energy Jmax (J/mol)
     D_Jmax::Quantity{T, dimension(J/mol)} # Deactivation energy of Jmax (J/mol)
@@ -97,14 +106,14 @@ end
 
 function C3Q(; Sco25 = 2800.0, E_Sco = -24.46e3J/mol, Kmc25 = 270.0μmol/mol, E_Kmc = 80.99e3J/mol,
             Kmo25 = 165.0e3μmol/mol, E_Kmo = 23.72e3J/mol, Vcmax25 = 120.0μmol/m^2/s, E_Vcmax = 65.33e3J/mol,
-            theta = 0.7, alpha = 0.25, Jmax25 = 230.0μmol/m^2/s, E_Jmax = 30.0e3J/mol,
-            D_Jmax = 200.0e3J/mol, Topt_Jmax = 300.5K, TPU25 = 12.0μmol/m^2/s, E_TPU = 53.1e3J/mol,
-            D_TPU = 201.8e3J/mol, Topt_TPU = 306.5K, Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol,
-            gm25 = 0.4mol/m^2/s, E_gm = 49.6e3J/mol, D_gm = 437.4e3J/mol, Topt_gm = 308.6K,
-            gso = 0.01mol/m^2/s, a1 = 0.85, b1 = 0.14/kPa)
+            theta = 0.7, Phi2 = 0.82, sigma2 = 0.5, beta = 0.85, fcyc = 0.1, fpseudo = 0.05, 
+            Jmax25 = 230.0μmol/m^2/s, E_Jmax = 30.0e3J/mol, D_Jmax = 200.0e3J/mol, Topt_Jmax = 300.5K, 
+            TPU25 = 12.0μmol/m^2/s, E_TPU = 53.1e3J/mol, D_TPU = 201.8e3J/mol, Topt_TPU = 306.5K, 
+            Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol, gm25 = 0.4mol/m^2/s, E_gm = 49.6e3J/mol, 
+            D_gm = 437.4e3J/mol, Topt_gm = 308.6K, gso = 0.01mol/m^2/s, a1 = 0.85, b1 = 0.14e-3/Pa)
 
-    C3Q(Sco25, E_Sco, Kmc25, E_Kmc, Kmo25, E_Kmo, Vcmax25, E_Vcmax,
-        theta, alpha, Jmax25, E_Jmax, D_Jmax, Topt_Jmax, TPU25, E_TPU,
+    C3Q(Sco25, E_Sco, Kmc25, E_Kmc, Kmo25, E_Kmo, Vcmax25, E_Vcmax, theta, Phi2, sigma2,
+        beta, fcyc, fpseudo, Jmax25, E_Jmax, D_Jmax, Topt_Jmax, TPU25, E_TPU,
         D_TPU, Topt_TPU, Rd25, E_Rd, gm25, E_gm, D_gm, Topt_gm, gso, a1, b1)
 end
 
@@ -144,7 +153,8 @@ function A_gs(p::C3, PAR, RH, Tleaf, Ca, O2, gb)
     Ac = solveAC3(gm, gb, p.gso, fvpd, x2_c, x1_c, gamma_star, Rd, Ca) # μmol/m2/s
 
     # Limitation by electron transport
-    J = (p.alpha*PAR + Jmax - sqrt((p.alpha*PAR + Jmax)^2.0 - 4.0*p.theta*p.alpha*Jmax*PAR))/(2*p.theta) # μmol/m2/s
+    alpha = p.Phi2*p.sigma2*p.beta*(1 - p.fpseudo/(1 - p.fcyc))
+    J = (alpha*PAR + Jmax - sqrt((alpha*PAR + Jmax)^2.0 - 4.0*p.theta*alpha*Jmax*PAR))/(2*p.theta) # μmol/m2/s
     x1_j = J/4.0 # μmol/m2/s
     x2_j = 2*gamma_star # μmol/mol
     Aj = solveAC3(gm, gb, p.gso, fvpd, x2_j, x1_j, gamma_star, Rd, Ca) # μmol/m2/s
@@ -158,9 +168,9 @@ function A_gs(p::C3, PAR, RH, Tleaf, Ca, O2, gb)
     A = min(Ac,min(Aj,Ap)) # μmol/m2/s
 
     # Stomatal conductance
-    gs = solvegs(p.gso,  A,  Ca, Ci_star,  Rd,  fvpd, gb) # mol/m2/s
+    gsc = solvegs(p.gso,  A,  Ca, Ci_star,  Rd,  fvpd, gb) # mol/m2/s
 
-    return (A = A, gs = gs) 
+    return (A = A, gs = gsc) 
 
 end
 

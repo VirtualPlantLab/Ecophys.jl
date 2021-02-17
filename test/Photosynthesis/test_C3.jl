@@ -13,8 +13,8 @@ Ca_f = 400.0 # μmol/mol
 O2_f = 210e3 # μmol/mol
 gb_f = 1.0 # mol/m^2/s
 A_f, gs_f  = PH.A_gs(c3_f, PAR_f, RH_f, Tleaf_f, Ca_f, O2_f, gb_f)
-@test A_f ≈ 21.73243935392202
-@test gs_f ≈ 0.0022225283032597217
+@test abs(A_f - 22.8210) < 1e-4
+@test abs(gs_f - 0.0022) < 1e-4
 
 # C3F - Photosynthesis with units
 c3_q = PH.C3Q()

@@ -44,7 +44,7 @@ function C4F(; Sco25 = 2590.0, E_Sco = -24.46e3, Kmc25 = 650.0, E_Kmc = 79.43e3,
     E_Kmo = 36380.0, Vcmax25 = 120.0, E_Vcmax = 65.33, theta = 0.7, Phi2 = 0.83, sigma2 = 0.5, 
     beta = 0.85, fQ = 1.0, fpseudo = 0.1, h = 4.0, Jmax25 = 230.0, E_Jmax = 48e3, D_Jmax = 200e3, 
     Topt_Jmax = 300.5, x = 0.4, alpha = 0.1, kp25 = 0.7, E_kp = 46.39e3, gbs = 0.003, Rd25 = 1.2, 
-    E_Rd = 46.39e3, gso = 0.01, a1 = 0.9, b1 = 0.15)
+    E_Rd = 46.39e3, gso = 0.01, a1 = 0.9, b1 = 0.15e-3)
 
     C4F(Sco25, E_Sco, Kmc25, E_Kmc, Kmo25, E_Kmo, Vcmax25, E_Vcmax, theta, Phi2, sigma2, beta, 
         fQ, fpseudo, h, Jmax25, E_Jmax, D_Jmax, Topt_Jmax, x, alpha, kp25, E_kp, gbs, Rd25, E_Rd, gso, a1, b1)
@@ -68,7 +68,7 @@ mutable struct C4Q{T <: Real} <: C4
     sigma2::T # Partitioning of excitation between PSII and PSI
     beta::T # Leaf absorptance of PAR
     fQ::T # Fraction of electrons at reduced plastoquinone that follow the Q-cycle
-    fpseudo::T # Fraction of electrons at PSI that follow cyclic transport around PSI
+    fpseudo::T # Fraction of electrons at PSI that are used by alternative electron sinks
     h::T # Number of protons required to produce one ATP
     Jmax25::Quantity{T, dimension(μmol/m^2/s)} # Maximum rate of electron transport (μmol/m2/s)
     E_Jmax::Quantity{T, dimension(J/mol)} # Activation energy Jmax (J/mol)
@@ -95,7 +95,7 @@ function C4Q(; Sco25 = 2590.0, E_Sco = -24.46e3J/mol, Kmc25 = 650.0μmol/mol, E_
             theta = 0.7, Phi2 = 0.83, sigma2 = 0.5, beta = 0.85, fQ = 1.0, fpseudo = 0.1, h = 4.0, 
             Jmax25 = 230.0μmol/m^2/s, E_Jmax = 48e3J/mol, D_Jmax = 200e3J/mol, Topt_Jmax = 300.5K, 
             x = 0.4, alpha = 0.1, kp25 = 0.7mol/m^2/s, E_kp = 46.39e3J/mol, gbs = 0.003mol/m^2/s, 
-            Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol, gso = 0.01mol/m^2/s, a1 = 0.9, b1 = 0.15/kPa)
+            Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol, gso = 0.01mol/m^2/s, a1 = 0.9, b1 = 0.15e-3/Pa)
 
     C4Q(Sco25, E_Sco, Kmc25, E_Kmc, Kmo25, E_Kmo, Vcmax25, E_Vcmax,
     theta, Phi2, sigma2, beta, fQ, fpseudo, h, Jmax25, E_Jmax, D_Jmax, Topt_Jmax, 
@@ -178,9 +178,9 @@ function A_gs(p::C4, PAR, RH, Tleaf, Ca, O2, gb)
     A  = min(Ac, Aj)
 
     # Stomatal conductance
-    gs = solvegs(p.gso,  A,  Ca, Cs_star,  Rd,  fvpd, gb) # mol/m2/s
+    gsc = solvegs(p.gso,  A,  Ca, Cs_star,  Rd,  fvpd, gb) # mol/m2/s
 
-    return (A = A, gs = gs) 
+    return (A = A, gs = gsc) 
 end
 
 
