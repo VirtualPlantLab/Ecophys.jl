@@ -1,11 +1,35 @@
+### This file contains public API ###
+# gb
+# simplegb
+# simplegbQ
+# gbAngle
+# gbAngleQ
+
 import SpecialFunctions: beta
 
-abstract type gbtype end
+abstract type gbType end
 
-function gb(p::gbtype, ws, Tl, Ta, P)
+"""
+    gb(p::gbType, ws, Tleaf, Tair, P)
+
+Compute boundary layer conductance for heat, water vapor and CO2.
+
+# Arguments
+- `p`: Model of boundary layer conductance
+- `ws`: Wind speed (m/s)
+- `Tleaf`: Leaf temperature (K)
+- `Tair`: Air temperature (K)
+- `P`: Air pressure (Pa)
+
+# Returns
+- `gbh`: Boundary layer conductance for heat (W/m²/K)
+- `gbw`: Boundary layer conductance for water vapor (mol/m²/s)
+- `gbc`: Boundary layer conductance for CO2 (mol/m²/s)
+"""
+function gb(p::gbType, ws, Tleaf, Tair, P)
     # Compute constants with the proper units
     mode = typeof(ws)
-    Tavg = (Tl + Ta)/2
+    Tavg = (Tleaf + Tair)/2
     a    = ThermalExpansion(Tavg)
     g    = Gravity(mode)
     ν    = KinematicViscosity(Tavg)
@@ -13,14 +37,14 @@ function gb(p::gbtype, ws, Tl, Ta, P)
     Mv   = MolarVolume(Tavg, P)
     R    = GasConstant(mode)
 
-    # Nusselt number under dree convection
-    Gr = a*g*p.d^3*abs(Tl - Ta)/ν^2 # Grashof number
+    # Nusselt number under free convection
+    Gr = a*g*p.d^3*abs(Tleaf - Tair)/ν^2 # Grashof number
     Nufree = 0.5*Gr^0.25 # Horizontal flat plate - laminar flow
 
     # Forced convection with effect of aspect ratio and inclination
     Re = p.d*ws/ν
     Nuforced = Nuforc(Re) # Flat plate - laminar & turbulent flow
-    front, back = enhancegb(p) # Empirical model based on data reviewer by Schuepp(1993)
+    front, back = enhancegb(p) # Empirical model based on data reviewed by Schuepp(1993)
     Nuforced = Nuforced/2*(front + back)
 
     # Mixed convection formula proposed by Schuepp (1993)
@@ -49,103 +73,152 @@ end
 
 ##### Classic model of boundary layer conductance #####
 
-abstract type simplegb <: gbtype end
+abstract type simplegbType <: gbType end
 
-struct simplegbF{T <: Real} <: simplegb
-    d::T # Characteristic length (m)
+"""
+    simplegb(; d = 0.01)
+
+Simple model of boundary layer conductance.
+
+# Arguments
+- `d`: Characteristic leaf length (m)
+"""
+Base.@kwdef struct simplegb{T <: Real} <: simplegbType
+    d::T = 0.01 # Characteristic length (m)
 end
 
-struct simplegbQ{T <: Real} <: simplegb
-    d::Quantity{T, dimension(m)} # Characteristic length (m)
+"""
+    simplegbQ(; d = 0.01m)
+
+Simple model of boundary layer conductance using `Quantity` from Unitful.jl.
+
+# Arguments
+- `d`: Characteristic leaf length (m)
+"""
+Base.@kwdef struct simplegbQ{T <: Real} <: simplegbType
+    d::Quantity{T, dimension(m)} = 0.01m # Characteristic length (m)
 end
 
-function simplegbF(; d = 0.01)
-    simplegbF(d)
-end
-
-function simplegbQ(; d = 0.01m)
-    simplegbQ(d)
-end
-
-function enhancegb(p::simplegb)
+function enhancegb(p::simplegbType)
     return (1.0, 1.0)
 end
 
 ##### Effect of leaf angle and aspect ratio on boundary layer conductance #####
 
 
-abstract type gbAngle <: gbtype end
-
-struct gbAngleF{T <: Real} <: gbAngle
-    d::T     # Characteristic length (m)
-    ang::T  # Leaf inclination angle (rad)
-    ar::T    # Leaf aspect ratio (length/width)
-    # Enhancement of front boundary layer conductance due to leaf inclination angle
-    fangm::T # Maximum enhancement factor
-    fangk::T # Exponent in response
-    # Effect on back boundary layer conductance due to leaf inclination angle and aspect ratio
-    α::T
-    # 1. Effect of aspect ratio on beta parameter of beta density function
-    b0_0::T
-    d_b0::T
-    b0_n::T
-    b0_KAR::T
-    # 2. Effect of aspect ratio on height factor of beta density function
-    db_0::T
-    d_db::T
-    db_n::T
-    db_KAR::T
-    # 3. Effect of aspect ratio on vertical displacement of beta density function
-    β_0::T
-    d_β::T
-    β_n::T
-    β_KAR::T 
-end
-
-struct gbAngleQ{T <: Real} <: gbAngle
-    d::Quantity{T, dimension(m)}     # Characteristic length (m)
-    ang::T  # Leaf inclination angle (°)
-    ar::T    # Leaf aspect ratio (length/width)
-    # Enhancement of front boundary layer conductance due to leaf inclination angle
-    fangm::T # Maximum enhancement factor
-    fangk::T # Exponent in response
-    # Effect on back boundary layer conductance due to leaf inclination angle and aspect ratio
-    α::T
-    # 1. Effect of aspect ratio on beta parameter of beta density function
-    b0_0::T
-    d_b0::T
-    b0_n::T
-    b0_KAR::T
-    # 2. Effect of aspect ratio on height factor of beta density function
-    db_0::T
-    d_db::T
-    db_n::T
-    db_KAR::T
-    # 3. Effect of aspect ratio on vertical displacement of beta density function
-    β_0::T
-    d_β::T
-    β_n::T
-    β_KAR::T 
-end
-
-function gbAngleF(; d = 0.01, ang = 0.0, ar = 1.0, fangm = 1.381, fangk = 0.034, 
-     α = 2.738, b0_0 = 0.455, d_b0 = 2.625, b0_n = 0.373, b0_KAR = 28.125,  db_0 = 0.085, 
-     d_db = 0.437, db_n = 5.175, db_KAR = 0.884,  β_0 = 3.362, d_β = 17.664, β_n = 4.727, 
-     β_KAR = 0.677)
-  gbAngleF(d, ang , ar, fangm, fangk, α, b0_0, d_b0, b0_n, b0_KAR, 
-    db_0, d_db, db_n, db_KAR, β_0, d_β, β_n, β_KAR)
-end
-
-function gbAngleQ(; d = 0.01m, ang = 0.0, ar = 1.0, fangm = 1.381, fangk = 0.034, 
+abstract type gbAngleType <: gbType end
+"""
+    gbAngle(; d = 0.01, ang = 0.0, ar = 1.0, fangm = 1.381, fangk = 0.034, 
     α = 2.738, b0_0 = 0.455, d_b0 = 2.625, b0_n = 0.373, b0_KAR = 28.125,  db_0 = 0.085, 
     d_db = 0.437, db_n = 5.175, db_KAR = 0.884,  β_0 = 3.362, d_β = 17.664, β_n = 4.727, 
     β_KAR = 0.677)
- gbAngleQ(d, ang , ar, fangm, fangk, α, b0_0, d_b0, b0_n, b0_KAR, 
-   db_0, d_db, db_n, db_KAR, β_0, d_β, β_n, β_KAR)
+
+Model of boundary layer conductance that accounts for inclination angle and leaf
+aspect ratio (see documentation for details).
+
+# Arguments
+- `d`: Characteristic leaf length (m)
+- `ang`: Leaf inclination angle (°)
+- `ar`: Leaf aspect ratio (length/width)
+- `fangm`: Maximum enhancement factor due to inclination angle
+- `fangk`: Exponent in response to inclination angle
+- `α`: Effect on back boundary layer conductance due to leaf inclination angle and aspect ratio
+- `b0_0`: Parameter in the effect of aspect ratio (see documentation)
+- `d_b0`: Parameter in the effect of aspect ratio (see documentation)
+- `b0_n`: Parameter in the effect of aspect ratio (see documentation)
+- `b0_KAR`: Parameter in the effect of aspect ratio (see documentation)
+- `db_0`: Parameter in the effect of aspect ratio (see documentation)
+- `d_db`: Parameter in the effect of aspect ratio (see documentation)
+- `db_n`: Parameter in the effect of aspect ratio (see documentation)
+- `db_KAR`: Parameter in the effect of aspect ratio (see documentation)
+- `β_0`: Parameter in the effect of aspect ratio (see documentation)
+- `d_β`: Parameter in the effect of aspect ratio (see documentation)
+- `β_n`: Parameter in the effect of aspect ratio (see documentation)
+- `β_KAR`: Parameter in the effect of aspect ratio (see documentation)
+"""
+Base.@kwdef struct gbAngle{T <: Real} <: gbAngleType
+    d::T     = 0.01   # Characteristic length (m)
+    ang::T   = 0.0  # Leaf inclination angle (rad)
+    ar::T    = 1.0  # Leaf aspect ratio (length/width)
+    # Enhancement of front boundary layer conductance due to leaf inclination angle
+    fangm::T = 1.381 # Maximum enhancement factor
+    fangk::T = 0.034 # Exponent in response
+    # Effect on back boundary layer conductance due to leaf inclination angle and aspect ratio
+    α::T     = 2.738
+    # 1. Effect of aspect ratio on beta parameter of beta density function
+    b0_0::T   = 0.455
+    d_b0::T   = 2.625
+    b0_n::T   = 0.373
+    b0_KAR::T = 28.125
+    # 2. Effect of aspect ratio on height factor of beta density function
+    db_0::T   = 0.085
+    d_db::T   = 0.437
+    db_n::T   = 5.175
+    db_KAR::T = 0.884
+    # 3. Effect of aspect ratio on vertical displacement of beta density function
+    β_0::T    = 3.362
+    d_β::T    = 17.664
+    β_n::T    = 4.727
+    β_KAR::T  = 0.677
+end
+
+"""
+    gbAngleQ(; d = 0.01m, ang = 0.0, ar = 1.0, fangm = 1.381, fangk = 0.034, 
+    α = 2.738, b0_0 = 0.455, d_b0 = 2.625, b0_n = 0.373, b0_KAR = 28.125,  db_0 = 0.085, 
+    d_db = 0.437, db_n = 5.175, db_KAR = 0.884,  β_0 = 3.362, d_β = 17.664, β_n = 4.727, 
+    β_KAR = 0.677)
+
+Model of boundary layer conductance that accounts for inclination angle and leaf
+aspect ratio (see documentation for details) using `Quantity` for Unitful.jl.
+
+# Arguments
+- `d`: Characteristic leaf length (m)
+- `ang`: Leaf inclination angle (°)
+- `ar`: Leaf aspect ratio (length/width)
+- `fangm`: Maximum enhancement factor due to inclination angle
+- `fangk`: Exponent in response to inclination angle
+- `α`: Effect on back boundary layer conductance due to leaf inclination angle and aspect ratio
+- `b0_0`: Parameter in the effect of aspect ratio (see documentation)
+- `d_b0`: Parameter in the effect of aspect ratio (see documentation)
+- `b0_n`: Parameter in the effect of aspect ratio (see documentation)
+- `b0_KAR`: Parameter in the effect of aspect ratio (see documentation)
+- `db_0`: Parameter in the effect of aspect ratio (see documentation)
+- `d_db`: Parameter in the effect of aspect ratio (see documentation)
+- `db_n`: Parameter in the effect of aspect ratio (see documentation)
+- `db_KAR`: Parameter in the effect of aspect ratio (see documentation)
+- `β_0`: Parameter in the effect of aspect ratio (see documentation)
+- `d_β`: Parameter in the effect of aspect ratio (see documentation)
+- `β_n`: Parameter in the effect of aspect ratio (see documentation)
+- `β_KAR`: Parameter in the effect of aspect ratio (see documentation)
+"""
+Base.@kwdef struct gbAngleQ{T <: Real} <: gbAngleType
+    d::Quantity{T, dimension(m)} = 0.01m # Characteristic length (m)
+    ang::T = 0.0 # Leaf inclination angle (°)
+    ar::T  = 1.0 # Leaf aspect ratio (length/width)
+    # Enhancement of front boundary layer conductance due to leaf inclination angle
+    fangm::T = 1.381 # Maximum enhancement factor
+    fangk::T = 0.034 # Exponent in response
+    # Effect on back boundary layer conductance due to leaf inclination angle and aspect ratio
+    α::T = 2.738
+    # 1. Effect of aspect ratio on beta parameter of beta density function
+    b0_0::T   = 0.455
+    d_b0::T   = 2.625
+    b0_n::T   = 0.373
+    b0_KAR::T = 28.125
+    # 2. Effect of aspect ratio on height factor of beta density function
+    db_0::T   = 0.085
+    d_db::T   = 0.437
+    db_n::T   = 5.175
+    db_KAR::T = 0.884
+    # 3. Effect of aspect ratio on vertical displacement of beta density function
+    β_0::T    = 3.362
+    d_β::T    = 17.664
+    β_n::T    = 4.727
+    β_KAR::T  = 0.677
 end
 
 # Compute the effects of leaf angle and aspect ratio on the front and back boundary layer conductance
-function enhancegb(p::gbAngle)
+function enhancegb(p::gbAngleType)
     # Enhancement on the front side
     front = (p.fangm - (p.fangm - 1.0)*exp(-p.ang*p.fangk))
     # Efect on the back side
@@ -157,4 +230,3 @@ function enhancegb(p::gbAngle)
                                1 + (thres - 1)/3*p.ang)
     (front, back)
 end
-

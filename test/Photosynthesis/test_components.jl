@@ -1,8 +1,11 @@
+
 using Test
 import Ecophys
 import Unitful: K, J, K, mol, kPa, Quantity, μmol, m, s, W, Pa, N, kg
 import Unitful
 PH = Ecophys.Photosynthesis
+
+let
 
 # Constants used in different modules
 @test PH.GasConstant(Float64) == 8.31446261815324
@@ -86,3 +89,5 @@ PH = Ecophys.Photosynthesis
 # Molar heat of vaporization
 @test PH.MolarHeatVapour(298.15) == 44076.55
 @test PH.MolarHeatVapour(298.15K) == 44076.55J/mol
+
+end

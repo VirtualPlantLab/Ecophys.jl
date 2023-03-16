@@ -1,3 +1,6 @@
+
+let
+
 using Test
 import Ecophys
 import Unitful
@@ -16,7 +19,7 @@ Ta_q = 298.0K
 P_q = 101325.0Pa
 
 # Classic boundary layer conductance - no units
-gb_f = PH.simplegbF()
+gb_f = PH.simplegb()
 @test gb_f.d == 0.01
 gbh_f, gbw_f, gbc_f = PH.gb(gb_f, ws_f, Tl_f, Ta_f, P_f)
 @test gbh_f ≈ 0.44748020949010225
@@ -34,7 +37,7 @@ gbh_q, gbw_q, gbc_q = PH.gb(gb_q, ws_q, Tl_q, Ta_q, P_q)
 @test gbc_q ≈ 0.6591912763456346mol/m^2/s
 
 # Novel boundary layer conductance model - no units
-gba_f = PH.gbAngleF()
+gba_f = PH.gbAngle()
 @test gba_f.d == 0.01
 gbh_f, gbw_f, gbc_f = PH.gb(gb_f, ws_f, Tl_f, Ta_f, P_f)
 @test gbh_f ≈ 0.44748020949010225
@@ -57,3 +60,5 @@ gbh_q, gbw_q, gbc_q = PH.gb(gba_q, ws_q, Tl_q, Ta_q, P_q)
 @test abs(gbh_q - 0.5222mol/m^2/s) < 1e-4mol/m^2/s
 @test abs(gbw_q - 0.5615mol/m^2/s) < 1e-4mol/m^2/s
 @test abs(gbc_q - 0.7692mol/m^2/s) < 1e-4mol/m^2/s
+
+end
