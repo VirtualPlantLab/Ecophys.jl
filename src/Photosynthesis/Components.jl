@@ -26,7 +26,7 @@ Gravity(::Type{T}) where T <: Real = T(9.7803274) # m/s^2
 Gravity(::Type{T}) where T <: Quantity = 9.7803274m/s^2
 
 # Energy of a umol of PAR
-PAREnergy(::Type{T}) where T <: Real = T(1/4.56) # J/mol
+PAREnergy(::Type{T}) where T <: Real = T(1/4.56) # J/umol
 PAREnergy(::Type{T}) where T <: Quantity = 1/4.56*J/μmol
 
 # 25 Celsius in Kelvin
@@ -117,18 +117,18 @@ end
 
 # Kinematic viscosity
 function KinematicViscosity(Tavg::T) where T <: Real
-    T((1e-5Tavg^2 + 0.0034Tavg - 0.3328)*1e-5) # m^2/s
+    T((1e-5Tavg*Tavg + 0.0034Tavg - 0.3328)*1e-5) # m^2/s
 end
 function KinematicViscosity(Tavg::T) where T <: Quantity
-    (1e-5/K^2*Tavg^2 + 0.0034/K*Tavg - 0.3328)*1e-5m^2/s # m^2/s
+    (1e-5/K^2*Tavg*Tavg + 0.0034/K*Tavg - 0.3328)*1e-5m^2/s # m^2/s
 end
 
 # Thermal diffusivity
 function ThermalDiffusivity(Tavg::T) where T <: Real
-    T((0.0001Tavg^2 + 0.0561Tavg - 6.1952)*1e-6) # m^2/s
+    T((0.0001Tavg*Tavg + 0.0561Tavg - 6.1952)*1e-6) # m^2/s
 end
 function ThermalDiffusivity(Tavg::T) where T <: Quantity
-    (0.0001/K^2*Tavg^2 + 0.0561/K*Tavg - 6.1952)*1e-6m^2/s # m^2/s
+    (0.0001Tavg*Tavg/K^2 + 0.0561*Tavg/K - 6.1952)*1e-6m^2/s # m^2/s
 end
 
 # Molar volume 
@@ -140,7 +140,7 @@ AirDensity(Tavg::T) where T <: Quantity = kg/m^3/(0.0028/K*Tavg + 0.0002)
 
 # Specific heat of the air
 SpecificHeat(Tavg::T) where T <: Real = (4e-7Tavg^2 - 0.0002Tavg + 1.0308)*1e3 # J/kg/K
-SpecificHeat(Tavg::T) where T <: Quantity = (4e-7/K^2*Tavg^2 - 0.0002/K*Tavg + 1.0308)*1e3J/kg/K
+SpecificHeat(Tavg::T) where T <: Quantity = (4e-7Tavg*Tavg/(K^2) - 0.0002/K*Tavg + 1.0308)*1e3J/kg/K
 
 # Molar heat of vaporization
 MolarHeatVapour(Tavg::T) where T <: Real = 56.897e3 - 0.043e3*Tavg # J/mol

@@ -1,1 +1,7 @@
 /Manifest.toml
+dev
+docs
+build
+.gitignore
+science_docs
+.Rproj.user

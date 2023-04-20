@@ -38,17 +38,18 @@ function gb(p::gbType, ws, Tleaf, Tair, P)
     R    = GasConstant(mode)
 
     # Nusselt number under free convection
-    Gr = a*g*p.d^3*abs(Tleaf - Tair)/ν^2 # Grashof number
-    Nufree = 0.5*Gr^0.25 # Horizontal flat plate - laminar flow
+    # DO NOT USE EXPONENTIATION BECAUSE IT MESSES UP INTEGRATION WITH UNITFUL.JL    
+    Gr::Float64 = a*g*p.d*p.d*p.d*abs(Tleaf - Tair)/(ν*ν) # Grashof number
+    Nufree::Float64 = 0.5*Gr^0.25 # Horizontal flat plate - laminar flow
 
     # Forced convection with effect of aspect ratio and inclination
-    Re = p.d*ws/ν
-    Nuforced = Nuforc(Re) # Flat plate - laminar & turbulent flow
-    front, back = enhancegb(p) # Empirical model based on data reviewed by Schuepp(1993)
+    Re::Float64 = p.d*ws/ν
+    Nuforced::Float64 = Nuforc(Re) # Flat plate - laminar & turbulent flow
+    front::Float64, back::Float64 = enhancegb(p) # Empirical model based on data reviewed by Schuepp(1993)
     Nuforced = Nuforced/2*(front + back)
 
     # Mixed convection formula proposed by Schuepp (1993)
-    Nu = (Nufree^3.5 + Nuforced^3.5)^(1/3.5)
+    Nu::Float64 = (Nufree^3.5 + Nuforced^3.5)^(1/3.5)
 
     # Boundary layer conductances
     gbh = Nu*k/p.d/Mv
@@ -191,8 +192,8 @@ aspect ratio (see documentation for details) using `Quantity` for Unitful.jl.
 - `β_n`: Parameter in the effect of aspect ratio (see documentation)
 - `β_KAR`: Parameter in the effect of aspect ratio (see documentation)
 """
-Base.@kwdef struct gbAngleQ{T <: Real} <: gbAngleType
-    d::Quantity{T, dimension(m)} = 0.01m # Characteristic length (m)
+Base.@kwdef struct gbAngleQ{T <: Real, dT} <: gbAngleType
+    d::dT = 0.01m # Characteristic length (m)
     ang::T = 0.0 # Leaf inclination angle (°)
     ar::T  = 1.0 # Leaf aspect ratio (length/width)
     # Enhancement of front boundary layer conductance due to leaf inclination angle

@@ -164,15 +164,15 @@ Base.@kwdef mutable struct C4Q{T <: Real} <: C4Type
     b1::Quantity{T, dimension(1/kPa)} = 0.15e-3/Pa # Empirical parameter in gs formula (1/kPa)
 end
 
-function photosynthesis(p::C4; PAR = 1000.0, RH = 0.75, Tleaf = 298.0, Ca = 400.0, O2 = 210e3, gb = 0.5)
-    photosynthesis(p, PAR, RH, Tleaf, Ca, O2, gb)
+function photosynthesis(p::C4; PAR = 1000.0, RH = 0.75, Tleaf = 298.0, Ca = 400.0, O2 = 210e3, gb = 0.5, net = true)
+    photosynthesis(p, PAR, RH, Tleaf, Ca, O2, gb, net)
 end
 function photosynthesis(p::C4Q; PAR = 1000.0μmol/m^2/s, RH = 0.75, Tleaf = 298.0K, 
-              Ca = 400.0μmol/mol, O2 = 210e3μmol/mol, gb = 0.5mol/m^2/s)
-    photosynthesis(p, PAR, RH, Tleaf, Ca, O2, gb)
+              Ca = 400.0μmol/mol, O2 = 210e3μmol/mol, gb = 0.5mol/m^2/s, net = true)
+    photosynthesis(p, PAR, RH, Tleaf, Ca, O2, gb, net)
 end
 
-function photosynthesis(p::C4Type, PAR, RH, Tleaf, Ca, O2, gb)
+function photosynthesis(p::C4Type, PAR, RH, Tleaf, Ca, O2, gb, net)
 
     # Check whether we are using plain numbers of physical quantities
     mode = typeof(Ca)
@@ -235,11 +235,13 @@ function photosynthesis(p::C4Type, PAR, RH, Tleaf, Ca, O2, gb)
     # Take limiting factor
     Ac = min(Ac1, Ac2)
     Aj = min(Aj1, Aj2)
-    A  = min(Ac, Aj)
+    An  = min(Ac, Aj)
 
     # Stomatal conductance
-    gsc = solvegs(p.gso,  A,  Ca, Cs_star,  Rd,  fvpd, gb) # mol/m2/s
+    gsc = solvegs(p.gso,  An,  Ca, Cs_star,  Rd,  fvpd, gb) # mol/m2/s
 
+    # Choose the right output
+    A = net ? An : An + Rd
     return (A = A, gs = gsc) 
 end
 

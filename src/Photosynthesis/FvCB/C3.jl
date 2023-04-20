@@ -160,26 +160,28 @@ Base.@kwdef mutable struct C3Q{T <: Real} <: C3Type
 end
 
 """
-    photosynthesis(par::C3, PAR = 1000.0, RH = 0.75, Tleaf = 298.0, Ca = 400.0, O2 = 210e3, gb = 0.5)
-    photosynthesis(par::C4, PAR = 1000.0, RH = 0.75, Tleaf = 298.0, Ca = 400.0, O2 = 210e3, gb = 0.5)
-    photosynthesis(par::C3Q, PAR = 1000.0μmol/m^2/s, RH = 0.75, Tleaf = 298.0K, Ca = 400.0μmol/mol, O2 = 210e3μmol/mol, gb = 0.5mol/m^2/s)
-    photosynthesis(par::C4Q, PAR = 1000.0μmol/m^2/s, RH = 0.75, Tleaf = 298.0K, Ca = 400.0μmol/mol, O2 = 210e3μmol/mol, gb = 0.5mol/m^2/s)
+    photosynthesis(par::C3, PAR = 1000.0, RH = 0.75, Tleaf = 298.0, Ca = 400.0, O2 = 210e3, gb = 0.5, net = true)
+    photosynthesis(par::C4, PAR = 1000.0, RH = 0.75, Tleaf = 298.0, Ca = 400.0, O2 = 210e3, gb = 0.5, net = true)
+    photosynthesis(par::C3Q, PAR = 1000.0μmol/m^2/s, RH = 0.75, Tleaf = 298.0K, Ca = 400.0μmol/mol, O2 = 210e3μmol/mol, gb = 0.5mol/m^2/s, net = true)
+    photosynthesis(par::C4Q, PAR = 1000.0μmol/m^2/s, RH = 0.75, Tleaf = 298.0K, Ca = 400.0μmol/mol, O2 = 210e3μmol/mol, gb = 0.5mol/m^2/s, net = true)
 
-Calculate net CO2 assimilation (umol/m2/s), transpiration (mmol/m2/s) and stomatal
-condutance to fluxes of CO2 (mol/m2/s) as a function of photosynthetically active
+Calculate net or gross CO2 assimilation (umol/m2/s)
+and stomatal condutance to fluxes of CO2 (mol/m2/s) as a function of 
+photosynthetically active
 radiation (PAR, umol/m2/s), relative humidity (RH), leaf temperature (Tleaf,
 K), air CO2 partial pressure (Ca, μmol/mol), oxygen (O2, μmol/mol) and boundary layer 
-conductance to CO2 (gb, mol/m2/s). Environmental inputs must be scalar. 
+conductance to CO2 (gb, mol/m2/s). Environmental inputs must be scalar. The argument
+`net` indicates whether the net or gross CO2 assimilation should be returned.
 """
-function photosynthesis(p::C3; PAR = 1000.0, RH = 0.75, Tleaf = 298.0, Ca = 400.0, O2 = 210e3, gb = 0.5)
-    photosynthesis(p, PAR, RH, Tleaf, Ca, O2, gb)
+function photosynthesis(p::C3; PAR = 1000.0, RH = 0.75, Tleaf = 298.0, Ca = 400.0, O2 = 210e3, gb = 0.5, net = true)
+    photosynthesis(p, PAR, RH, Tleaf, Ca, O2, gb, net)
 end
 function photosynthesis(p::C3Q; PAR = 1000.0μmol/m^2/s, RH = 0.75, Tleaf = 298.0K, 
-              Ca = 400.0μmol/mol, O2 = 210e3μmol/mol, gb = 0.5mol/m^2/s)
-    photosynthesis(p, PAR, RH, Tleaf, Ca, O2, gb)
+              Ca = 400.0μmol/mol, O2 = 210e3μmol/mol, gb = 0.5mol/m^2/s, net = true)
+    photosynthesis(p, PAR, RH, Tleaf, Ca, O2, gb, net)
 end
 
-function photosynthesis(p::C3Type, PAR, RH, Tleaf, Ca, O2, gb)
+function photosynthesis(p::C3Type, PAR, RH, Tleaf, Ca, O2, gb, net)
     # Calculate VPD at leaf temperature (kPa)
     vpd = VPD(Tleaf, RH)
     fvpd = max(1.0/(1.0/(p.a1 - p.b1*vpd) - 1.0),0.0)
@@ -216,11 +218,13 @@ function photosynthesis(p::C3Type, PAR, RH, Tleaf, Ca, O2, gb)
     Ap = 3.0*TPU - Rd # μmol/m2/s
 
     # Minimum of three potential rates
-    A = min(Ac,min(Aj,Ap)) # μmol/m2/s
+    An = min(Ac,min(Aj,Ap)) # μmol/m2/s
 
     # Stomatal conductance
-    gsc = solvegs(p.gso,  A,  Ca, Ci_star,  Rd,  fvpd, gb) # mol/m2/s
-
+    gsc = solvegs(p.gso,  An,  Ca, Ci_star,  Rd,  fvpd, gb) # mol/m2/s
+    
+    # Choose the right output
+    A = net ? An : An + Rd
     return (A = A, gs = gsc) 
 
 end

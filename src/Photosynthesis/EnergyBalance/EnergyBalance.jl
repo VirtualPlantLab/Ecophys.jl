@@ -54,7 +54,7 @@ function energybalance(Tleaf, pgb, pAgs, pEb, PAR, NIR, ws, RH, Tair, Ca, P, O2)
     # Boundary layer conductance
     gbh, gbw, gbc = gb(pgb, ws, Tleaf, Tair, P)
     # Photosynthesis and stomnatal conductance
-    A, gsc = photosynthesis(pAgs, PAR = PAR, RH = RH, Tleaf = Tleaf, Ca = Ca, O2 = O2, gb = gbc)
+    _, gsc = photosynthesis(pAgs, PAR = PAR, RH = RH, Tleaf = Tleaf, Ca = Ca, O2 = O2, gb = gbc)
     # Solar radiation absorbed by the leaf
     pe = PAREnergy(mode) # Conversion of PAR from umol/m2/s to W/m2
     Q = PAR * pe * pEb.αPAR + NIR * pEb.αNIR 
@@ -89,12 +89,12 @@ end
                          NIR = 250.0W/m^2, ws = 1.0m/s, RH = 0.75, 
                          Tair = 298.0K, Ca = 400.0μmol/mol, P = 101.0kPa, 
                          O2 = 210.0mmol/mol, order = Order2(), xatol = 0.01, 
-                         maxfnevals = 100)
+                         maxfnevals = 100, net = true)
     solve_energy_balance(Ags::Union{C3, C4}; gb = simplegb(), 
                          opt = SimpleOptical(), PAR = 1000.0, NIR = 250.0, 
                          ws = 1.0, RH = 0.75, Tair = 298.0, Ca = 400.0, 
                          P = 101.0e3, O2 = 210.0e3, order = Order2(), xatol = 0.01, 
-                         maxfnevals = 100)
+                         maxfnevals = 100, net = true)
 
 Solve the leaf energy balance coupled to photosynthesis and transpiration.
 
@@ -115,6 +115,7 @@ Solve the leaf energy balance coupled to photosynthesis and transpiration.
           (see Roots.jl package for more information).
 - `xatol`: Absolute tolerance of the root solving algorithm (see Roots.jl package for more information),
 - `maxfnevals`: Maximum number of function evaluations of the root solving algorithm (see Roots.jl package for more information).
+- `net`: Whether to return net or gross CO2 assimilation.
 
 # Details
 
@@ -124,36 +125,38 @@ type.
 
 # Returns
 
-A named tuple with net CO2 assimilation (`A`, μmol/m^2/s), transpiration (`Tr`, 
-mol/m^2/s) and leaf temperature (`Tleaf`, K).
+A named tuple with net CO2 assimilation (`An`, μmol/m^2/s), gross CO2 
+assimilation (`Ag`, μmol/m^2/s), transpiration (`Tr`, mol/m^2/s) and leaf 
+temperature (`Tleaf`, K).
 """
 function solve_energy_balance(Ags::Union{C3Q, C4Q}; gb = simplegbQ(), 
                               opt = SimpleOptical(), PAR = 1000.0μmol/m^2/s, 
                               NIR = 250.0W/m^2, ws = 1.0m/s, RH = 0.75, 
                               Tair = 298.0K, Ca = 400.0μmol/mol, P = 101.0kPa, 
                               O2 = 210.0mmol/mol, order = Order2(), xatol = 0.01, 
-                              maxfnevals = 100)
+                              maxfnevals = 100, net = true)
     solve_energy_balance(Ags, gb, opt, PAR, NIR, ws, RH, Tair, Ca, P, O2,
-                         order, xatol, maxfnevals)
+                         order, xatol, maxfnevals, net)
 end
 function solve_energy_balance(Ags::Union{C3, C4}; gb = simplegb(), 
                               opt = SimpleOptical(), PAR = 1000.0, NIR = 250.0, 
                               ws = 1.0, RH = 0.75, Tair = 298.0, Ca = 400.0, 
                               P = 101.0e3, O2 = 210.0e3, order = Order2(), xatol = 0.01, 
-                              maxfnevals = 100)
+                              maxfnevals = 100, net = true)
     solve_energy_balance(Ags, gb, opt, PAR, NIR, ws, RH, Tair, Ca, P, O2,
-                         order, xatol, maxfnevals)
+                         order, xatol, maxfnevals, net)
 end
 
 function solve_energy_balance(pAgs, pgb, pEb, PAR, NIR, ws, RH, Tair, Ca, P, O2,
-                              order = Order2(), xatol = 0.01, maxfnevals = 100)
+                              order = Order2(), xatol = 0.01, maxfnevals = 100, net = true)
+    println("Currently solving the energy balance without units is broken (produces wrong results).")  
     # Find the temperature
     Tleaf = find_zero(x -> energybalance(x, pgb, pAgs, pEb, PAR, NIR, ws, RH, Tair, Ca, P, O2), 
                                   (Tair - 10, Tair + 10), order, xatol = xatol, maxfnevals = maxfnevals)
     # Boundary layer conductances
     gbh, gbw, gbc = gb(pgb, ws, Tleaf, Tair, P)
     # A and gsc
-    A, gsc = photosynthesis(pAgs, PAR = PAR, Tleaf = Tleaf, RH = RH, Ca = Ca, O2 = O2, gb = gbc)
+    A, gsc = photosynthesis(pAgs, PAR = PAR, Tleaf = Tleaf, RH = RH, Ca = Ca, O2 = O2, gb = gbc, net = net)
     # Transpiration
     Tr  = transpiration(gsw = gsc*1.6, gbw = gbw, Tleaf = Tleaf, Tair = Tair, P = P, RH = RH)
     # Return the temperature and two fluxes
@@ -162,7 +165,7 @@ end
 function solve_energy_balance(pAgs, pgb, pEb, PAR::Quantity, NIR::Quantity, 
                               ws::Quantity, RH, Tair::Quantity, Ca::Quantity, 
                               P::Quantity, O2::Quantity, order = Order2(), 
-                              xatol = 0.01, maxfnevals = 100)
+                              xatol = 0.01, maxfnevals = 100, net = true)        
     Tau = Tair/1.0K
     Tleaf = find_zero(x -> energybalance(x*K, pgb, pAgs, pEb, PAR, NIR, ws, RH, Tair, Ca, P, O2), 
                                   (Tau - 10, Tau + 10), order, xatol = xatol, maxfnevals = maxfnevals)
@@ -170,7 +173,7 @@ function solve_energy_balance(pAgs, pgb, pEb, PAR::Quantity, NIR::Quantity,
     # Boundary layer conductances
     gbh, gbw, gbc = gb(pgb, ws, Tleaf, Tair, P)
     # A and gsc
-    A, gsc = photosynthesis(pAgs, PAR = PAR, Tleaf = Tleaf, RH = RH, Ca = Ca, O2 = O2, gb = gbc)
+    A, gsc = photosynthesis(pAgs, PAR = PAR, Tleaf = Tleaf, RH = RH, Ca = Ca, O2 = O2, gb = gbc, net = net)
     # Transpiration
     Tr  = transpiration(gsw = gsc*1.6, gbw = gbw, Tleaf = Tleaf, Tair = Tair, P = P, RH = RH)
     # Return the temperature and two fluxes
