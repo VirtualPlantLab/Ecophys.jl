@@ -34,13 +34,9 @@ let
 @test PH.arrhenius(1.0mol, 65330.0J/mol, 298.15K) == 1.0mol
 
 # Peaked temperature response with optimum temperature
-@test PH.peaked(1.0, 26900.0, 2e5, 298.15, 298.15) == 1.0
-@test PH.peaked(1.0, 26900.0J/mol, 2e5J/mol, 298.15K, 298.15K) == 1.0
-@test PH.peaked(1.0mol, 26900.0J/mol, 2e5J/mol, 298.15K, 298.15K) == 1.0mol
-
-# Compute temperature optimum
-@test (PH.Topt(26900.0, 2e5, 650.0) - 300.5) < 0.1
-@test abs(PH.Topt(26900.0J/mol, 2e5J/mol, 650.0J/mol/K) - 300.5K) < 0.1K
+@test PH.peaked(1.0, 26900.0, 2e5, 650.0, 298.15) == 1.0
+@test PH.peaked(1.0, 26900.0J/mol, 2e5J/mol, 650.0J/K/mol, 298.15K) == 1.0
+@test PH.peaked(1.0mol, 26900.0J/mol, 2e5J/mol, 650.0J/K/mol, 298.15K) == 1.0mol
 
 # Saturated vapour pressure
 @test abs(PH.es(298.15) - 3167.69) < 0.01

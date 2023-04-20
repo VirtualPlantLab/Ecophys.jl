@@ -57,9 +57,9 @@ zeroconc(::Type{T}) where T <: Quantity = 0.0μmol/mol
 ########################### Temperature responses #############################
 ###############################################################################
 
-# Based on Medlyn et al. (2002, Plant, Cell & Environment)
+# Based on Yin & Struik (2009, NJAS-Wageningen Journal of Life Sciences)
 
-# Exponential increase with temperature, no optimum, normalized at 25 °C (Equation 10.3)
+# Exponential increase with temperature, no optimum, normalized at 25 °C
 function arrhenius(p25, Ha, Tk)
     mode = typeof(Ha)
     R = GasConstant(mode)
@@ -67,20 +67,15 @@ function arrhenius(p25, Ha, Tk)
     p25*exp((Tk - T₂₅)*Ha/(T₂₅*R*Tk))
 end
 
-# Increase with temperature with an optimum, normalized at optimum (Equation 10.5)
-function peaked(pₒₚₜ, Ha, Hd, Topt, Tk)
+# Increase with temperature with an optimum, normalized at 25 °C
+function peaked(p25, Ha, Hd, S, Tk)
     mode = typeof(Ha)
     R = GasConstant(mode) 
-    eterm1 = exp(Ha/R*(inv(Topt) - inv(Tk)))
-    eterm2 = exp(Hd/R*(inv(Topt) - inv(Tk)))
-    pₒₚₜ*Hd*eterm1/(Hd - Ha*(1.0 - eterm2))
-end
-
-# Calculate temperature optimum from entropy and other parameters
-function Topt(Ha, Hd, S)
-    mode = typeof(Ha)
-    R = GasConstant(mode) 
-    Hd/(S - R*log(Ha/(Hd - Ha)))
+    T₂₅ = Tref(mode)
+    term1 = arrhenius(p25, Ha, Tk)
+    term2 = 1.0 + exp((T₂₅*S - Hd)/(T₂₅*R))
+    term3 = 1.0 + exp((Tk*S - Hd)/(Tk*R))
+    term1*term2/term3
 end
 
 ###############################################################################

@@ -16,7 +16,7 @@ Ca_f = 400.0 # μmol/mol
 O2_f = 210e3 # μmol/mol
 gb_f = 1.0 # mol/m^2/s
 A_f,  gs_f  = PH.photosynthesis(c4, PAR = PAR_f, RH = RH_f, Tleaf = Tleaf_f, Ca = Ca_f, O2 = O2_f, gb = gb_f)
-@test abs(A_f - 29.89) < 0.01
+@test abs(A_f - 30.5477) < 0.0001
 @test abs(gs_f - 0.0018) < 1e-4
 Ag_f,  gs_f  = PH.photosynthesis(c4, PAR = PAR_f, RH = RH_f, Tleaf = Tleaf_f, Ca = Ca_f, O2 = O2_f, gb = gb_f, net = false)
 @test Ag_f > A_f
@@ -37,5 +37,9 @@ Ag_q,  gs_q  = PH.photosynthesis(c4_q, PAR = PAR_q, RH = RH_q, Tleaf = Tleaf_q, 
 @test A_q ≈ A_f*μmol/m^2/s
 @test Ag_q ≈ Ag_f*μmol/m^2/s
 @test gs_q ≈ gs_f*mol/m^2/s
+
+# Temperature response curves
+Ag = [PH.photosynthesis(C4(), Tleaf = 273.15 + x).A for x in 0:1:40.0]
+@test all(Ag .> 0.0)
 
 end

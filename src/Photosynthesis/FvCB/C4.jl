@@ -10,7 +10,7 @@ abstract type C4Type <: FvCB end
     C4(Sco25 = 2590.0, E_Sco = -24.46e3, Kmc25 = 650.0, E_Kmc = 79.43e3, Kmo25 = 450e3, 
        E_Kmo = 36380.0, Vcmax25 = 120.0, E_Vcmax = 65.33, theta = 0.7, Phi2 = 0.83, sigma2 = 0.5, 
        beta = 0.85, fQ = 1.0, fpseudo = 0.1, h = 4.0, Jmax25 = 230.0, E_Jmax = 48e3, D_Jmax = 200e3, 
-       Topt_Jmax = 300.5, x = 0.4, alpha = 0.1, kp25 = 0.7, E_kp = 46.39e3, gbs = 0.003, Rd25 = 1.2, 
+       S_Jmax = 630.0, x = 0.4, alpha = 0.1, kp25 = 0.7, E_kp = 46.39e3, gbs = 0.003, Rd25 = 1.2, 
        E_Rd = 46.39e3, gso = 0.01, a1 = 0.9, b1 = 0.15e-3)
 
 Data structure to store all the parameters for the C3 photosynthesis model.
@@ -34,7 +34,7 @@ Data structure to store all the parameters for the C3 photosynthesis model.
 - `Jmax25`: Maximum rate of electron transport (μmol/m2/s)
 - `E_Jmax`: Activation energy Jmax (J/mol)
 - `D_Jmax`: Deactivation energy of Jmax (J/mol)
-- `Topt_Jmax`: Entropy coefficient of Jmax (J/mol/K)
+- `S_Jmax`: Entropy coefficient of Jmax (J/mol/K)
 - `x`: Fraction of electron transport partitioned to mesophyll cells
 - `alpha`: Fraction of O2 evolution occuring in the bundle sheath
 - `kp25`: Initial carboxylation efficiency of the PEP carboxylase (mol/m2/s)
@@ -67,7 +67,7 @@ Base.@kwdef mutable struct C4{T <: Real} <: C4Type
     Jmax25::T = 230.0 # Maximum rate of electron transport (μmol/m2/s)
     E_Jmax::T = 48e3 # Activation energy Jmax (J/mol)
     D_Jmax::T = 200e3 # Deactivation energy of Jmax (J/mol)
-    Topt_Jmax::T = 300.5 # Entropy coefficient of Jmax (J/mol/K)
+    S_Jmax::T = 630.0 # Entropy coefficient of Jmax (J/mol/K)
     x::T = 0.4 # Fraction of electron transport partitioned to mesophyll cells
     alpha::T = 0.1 # Fraction of O2 evolution occuring in the bundle sheath
     # PEP carboxylation
@@ -88,7 +88,7 @@ end
     C4(Sco25 = 2590.0, E_Sco = -24.46e3J/mol, Kmc25 = 650.0μmol/mol, E_Kmc = 79.43e3J/mol,
        Kmo25 = 450e3μmol/mol, E_Kmo = 36380.0J/mol, Vcmax25 = 120.0μmol/m^2/s, E_Vcmax = 65.33J/mol,
        theta = 0.7, Phi2 = 0.83, sigma2 = 0.5, beta = 0.85, fQ = 1.0, fpseudo = 0.1, h = 4.0, 
-       Jmax25 = 230.0μmol/m^2/s, E_Jmax = 48e3J/mol, D_Jmax = 200e3J/mol, Topt_Jmax = 300.5K, 
+       Jmax25 = 230.0μmol/m^2/s, E_Jmax = 48e3J/mol, D_Jmax = 200e3J/mol, S_Jmax = 630.0J/mol/K, 
        x = 0.4, alpha = 0.1, kp25 = 0.7mol/m^2/s, E_kp = 46.39e3J/mol, gbs = 0.003mol/m^2/s, 
        Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol, gso = 0.01mol/m^2/s, a1 = 0.9, b1 = 0.15e-3/Pa)
 
@@ -114,7 +114,7 @@ Data structure to store all the parameters for the C4 photosynthesis model using
 - `Jmax25`: Maximum rate of electron transport (μmol/m2/s)
 - `E_Jmax`: Activation energy Jmax (J/mol)
 - `D_Jmax`: Deactivation energy of Jmax (J/mol)
-- `Topt_Jmax`: Entropy coefficient of Jmax (J/mol/K)
+- `S_Jmax`: Entropy coefficient of Jmax (J/mol/K)
 - `x`: Fraction of electron transport partitioned to mesophyll cells
 - `alpha`: Fraction of O2 evolution occuring in the bundle sheath
 - `kp25`: Initial carboxylation efficiency of the PEP carboxylase (mol/m2/s)
@@ -147,7 +147,7 @@ Base.@kwdef mutable struct C4Q{T <: Real} <: C4Type
     Jmax25::Quantity{T, dimension(μmol/m^2/s)} = 230.0μmol/m^2/s # Maximum rate of electron transport (μmol/m2/s)
     E_Jmax::Quantity{T, dimension(J/mol)} = 48e3J/mol # Activation energy Jmax (J/mol)
     D_Jmax::Quantity{T, dimension(J/mol)} = 200e3J/mol # Deactivation energy of Jmax (J/mol)
-    Topt_Jmax::Quantity{T, dimension(K)} = 300.5K # Optimum temperature of Jmax (J/mol/K)
+    S_Jmax::Quantity{T, dimension(J/K/mol)} = 630.0J/K/mol # Optimum temperature of Jmax (J/mol/K)
     x::T = 0.4 # Fraction of electron transport partitioned to mesophyll cells
     alpha::T = 0.1 # Fraction of O2 evolution occuring in the bundle sheath
     # PEP carboxylation
@@ -187,7 +187,7 @@ function photosynthesis(p::C4Type, PAR, RH, Tleaf, Ca, O2, gb, net)
     Vcmax = arrhenius(p.Vcmax25, p.E_Vcmax, Tleaf) # μmol/m2/s
     Kmc   = arrhenius(p.Kmc25, p.E_Kmc, Tleaf) # μmol/mol
     Kmo   = arrhenius(p.Kmo25, p.E_Kmo, Tleaf) # mmol/mol
-    Jmax  = peaked(p.Jmax25, p.E_Jmax, p.D_Jmax, p.Topt_Jmax, Tleaf) # μmol/m2/s
+    Jmax  = peaked(p.Jmax25, p.E_Jmax, p.D_Jmax, p.S_Jmax, Tleaf) # μmol/m2/s
     kp    = arrhenius(p.kp25, p.E_kp, Tleaf) # μmol/m2/s
 
     # Respiration in the mesophyll cells
