@@ -42,4 +42,12 @@ Ag_q,  gs_q  = PH.photosynthesis(c4_q, PAR = PAR_q, RH = RH_q, Tleaf = Tleaf_q, 
 Ag = [PH.photosynthesis(C4(), Tleaf = 273.15 + x).A for x in 0:1:40.0]
 @test all(Ag .> 0.0)
 
+# Light response curves
+Ag = [PH.photosynthesis(C4(), PAR = x, net = false).A for x in 50.0:50.0:2e3]
+@test all(Ag .> 0.0)
+
+# CO2 response curves
+Ag = [PH.photosynthesis(C4(), Ca = x, net = false).A for x in 50.0:50.0:2e3]
+@test all(Ag .> 0.0)
+
 end

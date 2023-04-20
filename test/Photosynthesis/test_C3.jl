@@ -39,7 +39,15 @@ Ag_q,  gs_q  = PH.photosynthesis(c3_q, PAR = PAR_q, RH = RH_q, Tleaf = Tleaf_q, 
 @test gs_q ≈ gs_f*mol/m^2/s
 
 # Temperature response curves
-Ag = [PH.photosynthesis(C3(), Tleaf = 273.15 + x).A for x in 0:1:40.0]
+Ag = [PH.photosynthesis(C3(), Tleaf = 273.15 + x, net = false).A for x in 0:1:40.0]
+@test all(Ag .> 0.0)
+
+# Light response curves
+Ag = [PH.photosynthesis(C3(), PAR = x, net = false).A for x in 50.0:50.0:2e3]
+@test all(Ag .> 0.0)
+
+# CO2 response curves
+Ag = [PH.photosynthesis(C3(), Ca = x, net = false).A for x in 50.0:50.0:2e3]
 @test all(Ag .> 0.0)
 
 end
