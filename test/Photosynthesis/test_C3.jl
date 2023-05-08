@@ -39,15 +39,24 @@ Ag_q,  gs_q  = PH.photosynthesis(c3_q, PAR = PAR_q, RH = RH_q, Tleaf = Tleaf_q, 
 @test gs_q ≈ gs_f*mol/m^2/s
 
 # Temperature response curves
-Ag = [PH.photosynthesis(C3(), Tleaf = 273.15 + x, net = false).A for x in 0:1:40.0]
+Ag = [PH.photosynthesis(PH.C3(), Tleaf = 273.15 + x, net = false).A for x in 0:1:40.0]
 @test all(Ag .> 0.0)
 
 # Light response curves
-Ag = [PH.photosynthesis(C3(), PAR = x, net = false).A for x in 50.0:50.0:2e3]
+Ag = [PH.photosynthesis(PH.C3(), PAR = x, net = false).A for x in 50.0:50.0:2e3]
 @test all(Ag .> 0.0)
 
 # CO2 response curves
-Ag = [PH.photosynthesis(C3(), Ca = x, net = false).A for x in 50.0:50.0:2e3]
+Ag = [PH.photosynthesis(PH.C3(), Ca = x, net = false).A for x in 50.0:50.0:2e3]
 @test all(Ag .> 0.0)
+
+# Using simplified version of the electron transport model
+c3 = PH.C3(simpleJ = true)
+A_f2,  gs_f2  = PH.photosynthesis(c3, PAR = PAR_f, RH = RH_f, Tleaf = Tleaf_f, Ca = Ca_f, O2 = O2_f, gb = gb_f)
+@test abs(A_f - A_f2)/A_f < 0.01
+
+c3 = PH.C3Q(simpleJ = true)
+A_q2,  gs_q2  = PH.photosynthesis(c3, PAR = PAR_q, RH = RH_q, Tleaf = Tleaf_q, Ca = Ca_q, O2 = O2_q, gb = gb_q)
+@test abs(A_q - A_q2)/A_q < 0.01
 
 end

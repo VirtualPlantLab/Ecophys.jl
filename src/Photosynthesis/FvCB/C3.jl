@@ -9,7 +9,8 @@ abstract type C3Type <: FvCB end
 """
     C3(Sco25 = 2800.0, E_Sco = -24.46e3, Kmc25 = 270.0, E_Kmc = 80.99e3, 
         Kmo25 = 165.0e3, E_Kmo = 23.72e3, Vcmax25 = 120.0, E_Vcmax = 65.33e3, 
-        theta = 0.7, Phi2 = 0.82, sigma2 = 0.5, beta = 0.85, fcyc = 0.1, 
+        simpleJ = false, k2ll = 0.35, theta = 0.7, Phi2 = 0.82, sigma2 = 0.5, 
+        beta = 0.85, fcyc = 0.1, 
         fpseudo = 0.05, Jmax25 = 230.0, E_Jmax = 30.0e3, D_Jmax = 200.0e3, 
         S_Jmax = 650.0, TPU25 = 12.0, E_TPU = 53.1e3, D_TPU = 20.18e3,
         S_TPU = 650.0, Rd25 = 1.2, E_Rd = 46.39e3, gm25 = 0.4, E_gm = 49.6e3, 
@@ -27,6 +28,8 @@ Data structure to store all the parameters for the C3 photosynthesis model.
 - `Vcmax25`: Maximum rate of carboxylation at 25 C (μmol/m2/s)
 - `E_Vcmax`: Activation energy of Vcmax (J/mol)
 - `theta`: Curvature parameter
+- `simpleJ`: Use k2ll rather than calculating from other parameters
+- `k2ll`: Low-light use efficiency for electron transport
 - `Phi2`: Low-light PSII quantum yield
 - `sigma2`: Partitioning of excitation between PSII and PSI
 - `beta`: Leaf absorptance of PAR
@@ -64,6 +67,8 @@ Base.@kwdef mutable struct C3{T <: Real} <: C3Type
     Vcmax25::T = 120.0 # Maximum rate of carboxylation at 25 C (μmol/m2/s)
     E_Vcmax::T = 65.33e3 # Activation energy of Vcmax (J/mol)
     # Electron transport
+    simpleJ::Bool = false # Use k2ll rather than calculating from other parameters
+    k2ll::T = 0.35 # Low-light use efficiency for electron transport (only when simpleJ = true)
     theta::T  = 0.7 # Curvature parameter
     Phi2::T   = 0.82 # Low-light PSII quantum yield
     sigma2::T = 0.5# Partitioning of excitation between PSII and PSI
@@ -96,7 +101,7 @@ end
 """
     C3Q(Sco25 = 2800.0, E_Sco = -24.46e3J/mol, Kmc25 = 270.0μmol/mol, E_Kmc = 80.99e3J/mol,
          Kmo25 = 165.0e3μmol/mol, E_Kmo = 23.72e3J/mol, Vcmax25 = 120.0μmol/m^2/s, E_Vcmax = 65.33e3J/mol,
-         theta = 0.7, Phi2 = 0.82, sigma2 = 0.5, beta = 0.85, fcyc = 0.1, fpseudo = 0.05, 
+         simpleJ = false, k2ll = 0.35, theta = 0.7, Phi2 = 0.82, sigma2 = 0.5, beta = 0.85, fcyc = 0.1, fpseudo = 0.05, 
          Jmax25 = 230.0μmol/m^2/s, E_Jmax = 30.0e3J/mol, D_Jmax = 200.0e3J/mol, S_Jmax = 650.0J/mol/K, 
          TPU25 = 12.0μmol/m^2/s, E_TPU = 53.1e3J/mol, D_TPU = 201.8e3J/mol, S_TPU = 650.0K, 
          Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol, gm25 = 0.4mol/m^2/s, E_gm = 49.6e3J/mol, 
@@ -115,6 +120,8 @@ Data structure to store all the parameters for the C3 photosynthesis model using
 - `Vcmax25`: Maximum rate of carboxylation at 25 C (μmol/m2/s)
 - `E_Vcmax`: Activation energy of Vcmax (J/mol)
 - `theta`: Curvature parameter
+- `simpleJ`: Use k2ll rather than calculating from other parameters
+- `k2ll`: Low-light use efficiency for electron transport
 - `Phi2`: Low-light PSII quantum yield
 - `sigma2`: Partitioning of excitation between PSII and PSI
 - `beta`: Leaf absorptance of PAR
@@ -152,6 +159,8 @@ Base.@kwdef mutable struct C3Q{T <: Real} <: C3Type
     Vcmax25::Quantity{T, dimension(μmol/m^2/s)} = 120.0μmol/m^2/s # Maximum rate of carboxylation at 25 C (μmol/m2/s)
     E_Vcmax::Quantity{T, dimension(J/mol)} = 65.33e3J/mol # Activation energy of Vcmax (J/mol)
     # Electron transport
+    simpleJ::Bool = false # Use k2ll rather than calculating from other parameters
+    k2ll::T = 0.35 # Low-light use efficient for electron transport (only when simpleJ = true)
     theta::T = 0.7 # Curvature parameter
     Phi2::T = 0.82 # Low-light PSII quantum yield
     sigma2::T = 0.5 # Partitioning of excitation between PSII and PSI
@@ -228,7 +237,7 @@ function photosynthesis(p::C3Type, PAR, RH, Tleaf, Ca, O2, gb, net)
     Ac = solveAC3(gm, gb, p.gso, fvpd, x2_c, x1_c, gamma_star, Rd, Ca) # μmol/m2/s
 
     # Limitation by electron transport
-    alpha = p.Phi2*p.sigma2*p.beta*(1 - p.fpseudo/(1 - p.fcyc))
+    alpha = p.simpleJ ? p.k2ll : p.Phi2*p.sigma2*p.beta*(1 - p.fpseudo/(1 - p.fcyc))
     J = (alpha*PAR + Jmax - sqrt((alpha*PAR + Jmax)^2.0 - 4.0*p.theta*alpha*Jmax*PAR))/(2*p.theta) # μmol/m2/s
     x1_j = J/4.0 # μmol/m2/s
     x2_j = 2*gamma_star # μmol/mol
