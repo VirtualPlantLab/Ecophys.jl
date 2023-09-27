@@ -69,8 +69,8 @@ Base.@kwdef mutable struct C3{T <: Real} <: C3Type
     # Electron transport
     simpleJ::Bool = false # Use k2ll rather than calculating from other parameters
     k2ll::T = 0.35 # Low-light use efficiency for electron transport (only when simpleJ = true)
-    theta::T  = 0.7 # Curvature parameter
-    Phi2::T   = 0.82 # Low-light PSII quantum yield
+    theta::T = 0.7 # Curvature parameter
+    Phi2::T = 0.82 # Low-light PSII quantum yield
     sigma2::T = 0.5# Partitioning of excitation between PSII and PSI
     beta::T = 0.85 # Leaf absorptance of PAR
     fcyc::T = 0.1 #  Fraction of electrons at PSI that follow cyclic transport around PSI
@@ -148,16 +148,16 @@ Data structure to store all the parameters for the C3 photosynthesis model using
 Base.@kwdef mutable struct C3Q{T <: Real} <: C3Type
     # Rubisco CO2/O2 specificity
     Sco25::T = 2800.0 # Sc/o parameter at 25 C
-    E_Sco::Quantity{T, dimension(J/mol)} = -24.46e3J/mol # Apparent activation energy of Sc/o (J/mol)
+    E_Sco::Quantity{T, dimension(J / mol)} = -24.46e3J / mol # Apparent activation energy of Sc/o (J/mol)
     # Michaelis-Menten constants carboxylation (J/mol/K)
-    Kmc25::Quantity{T, dimension(μmol/mol)} = 270.0μmol/mol # Km for CO2 at 25 C (μmol/mol)
-    E_Kmc::Quantity{T, dimension(J/mol)} = 80.99e3J/mol # Activation energy of Kmc (J/mol)
+    Kmc25::Quantity{T, dimension(μmol / mol)} = 270.0μmol / mol # Km for CO2 at 25 C (μmol/mol)
+    E_Kmc::Quantity{T, dimension(J / mol)} = 80.99e3J / mol # Activation energy of Kmc (J/mol)
     # Michaelis-Menten constants oxygenation
-    Kmo25::Quantity{T, dimension(μmol/mol)} = 165.0e3μmol/mol # Km for O2 at 25 C (umol/mol)
-    E_Kmo::Quantity{T, dimension(J/mol)} = 23.72e3J/mol # Activation energy of Kmo (J/mol)
+    Kmo25::Quantity{T, dimension(μmol / mol)} = 165.0e3μmol / mol # Km for O2 at 25 C (umol/mol)
+    E_Kmo::Quantity{T, dimension(J / mol)} = 23.72e3J / mol # Activation energy of Kmo (J/mol)
     # Rubisco activity
-    Vcmax25::Quantity{T, dimension(μmol/m^2/s)} = 120.0μmol/m^2/s # Maximum rate of carboxylation at 25 C (μmol/m2/s)
-    E_Vcmax::Quantity{T, dimension(J/mol)} = 65.33e3J/mol # Activation energy of Vcmax (J/mol)
+    Vcmax25::Quantity{T, dimension(μmol / m^2 / s)} = 120.0μmol / m^2 / s # Maximum rate of carboxylation at 25 C (μmol/m2/s)
+    E_Vcmax::Quantity{T, dimension(J / mol)} = 65.33e3J / mol # Activation energy of Vcmax (J/mol)
     # Electron transport
     simpleJ::Bool = false # Use k2ll rather than calculating from other parameters
     k2ll::T = 0.35 # Low-light use efficient for electron transport (only when simpleJ = true)
@@ -167,27 +167,27 @@ Base.@kwdef mutable struct C3Q{T <: Real} <: C3Type
     beta::T = 0.85 # Leaf absorptance of PAR
     fcyc::T = 0.1 #  Fraction of electrons at PSI that follow cyclic transport around PSI
     fpseudo::T = 0.05 # Fraction of electrons at PSI that are used by alternative electron sinks
-    Jmax25::Quantity{T, dimension(μmol/m^2/s)} = 230.0μmol/m^2/s # Maximum rate of electron transport (μmol/m2/s)
-    E_Jmax::Quantity{T, dimension(J/mol)} = 30.0e3J/mol # Activation energy Jmax (J/mol)
-    D_Jmax::Quantity{T, dimension(J/mol)} = 200.0e3J/mol # Deactivation energy of Jmax (J/mol)
-    S_Jmax::Quantity{T, dimension(J/K/mol)} = 650.0J/K/mol # Entropy term for Jmax (K)
+    Jmax25::Quantity{T, dimension(μmol / m^2 / s)} = 230.0μmol / m^2 / s # Maximum rate of electron transport (μmol/m2/s)
+    E_Jmax::Quantity{T, dimension(J / mol)} = 30.0e3J / mol # Activation energy Jmax (J/mol)
+    D_Jmax::Quantity{T, dimension(J / mol)} = 200.0e3J / mol # Deactivation energy of Jmax (J/mol)
+    S_Jmax::Quantity{T, dimension(J / K / mol)} = 650.0J / K / mol # Entropy term for Jmax (K)
     # Triose phosphate utilisation
-    TPU25::Quantity{T, dimension(μmol/m^2/s)} = 12.0μmol/m^2/s # Maximum rate of triose phosphate utilisation (μmol/m2/s)
-    E_TPU::Quantity{T, dimension(J/mol)} = 53.1e3J/mol # Activation energy TPU (J/mol)
-    D_TPU::Quantity{T, dimension(J/mol)} = 201.8e3J/mol # Deactivation energy of TPU (J/mol)
-    S_TPU::Quantity{T, dimension(J/K/mol)} = 650.0J/K/mol #  Entropy term for TPU (K)
+    TPU25::Quantity{T, dimension(μmol / m^2 / s)} = 12.0μmol / m^2 / s # Maximum rate of triose phosphate utilisation (μmol/m2/s)
+    E_TPU::Quantity{T, dimension(J / mol)} = 53.1e3J / mol # Activation energy TPU (J/mol)
+    D_TPU::Quantity{T, dimension(J / mol)} = 201.8e3J / mol # Deactivation energy of TPU (J/mol)
+    S_TPU::Quantity{T, dimension(J / K / mol)} = 650.0J / K / mol #  Entropy term for TPU (K)
     # Respiration
-    Rd25::Quantity{T, dimension(μmol/m^2/s)} = 1.2μmol/m^2/s # Respiration rate at 25 C (μmol/m2/s)
-    E_Rd::Quantity{T, dimension(J/mol)} = 46.39e3J/mol # Activation energy of Rd (J/mol)
+    Rd25::Quantity{T, dimension(μmol / m^2 / s)} = 1.2μmol / m^2 / s # Respiration rate at 25 C (μmol/m2/s)
+    E_Rd::Quantity{T, dimension(J / mol)} = 46.39e3J / mol # Activation energy of Rd (J/mol)
     # Mesophyll conductance
-    gm25::Quantity{T, dimension(mol/m^2/s)} = 0.4mol/m^2/s # Mesophyll conductance at 25 C (mol/m2/s)
-    E_gm::Quantity{T, dimension(J/mol)} = 49.6e3J/mol # Activation energy of gm (J/mol)
-    D_gm::Quantity{T, dimension(J/mol)} = 437.4e3J/mol # Deactivation energy of gm (J/mol)
-    S_gm::Quantity{T, dimension(J/K/mol)} = 1400.0J/K/mol # Entropy term for gm (K)
+    gm25::Quantity{T, dimension(mol / m^2 / s)} = 0.4mol / m^2 / s # Mesophyll conductance at 25 C (mol/m2/s)
+    E_gm::Quantity{T, dimension(J / mol)} = 49.6e3J / mol # Activation energy of gm (J/mol)
+    D_gm::Quantity{T, dimension(J / mol)} = 437.4e3J / mol # Deactivation energy of gm (J/mol)
+    S_gm::Quantity{T, dimension(J / K / mol)} = 1400.0J / K / mol # Entropy term for gm (K)
     # Stomatal conductance
-    gso::Quantity{T, dimension(mol/m^2/s)} = 0.01mol/m^2/s # Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s)
+    gso::Quantity{T, dimension(mol / m^2 / s)} = 0.01mol / m^2 / s # Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s)
     a1::T = 0.85 # Empirical parameter in gs formula
-    b1::Quantity{T, dimension(1/kPa)} = 0.14e-3/Pa # Empirical parameter in gs formula (1/kPa)
+    b1::Quantity{T, dimension(1 / kPa)} = 0.14e-3 / Pa # Empirical parameter in gs formula (1/kPa)
 end
 
 """
@@ -204,18 +204,25 @@ K), air CO2 partial pressure (Ca, μmol/mol), oxygen (O2, μmol/mol) and boundar
 conductance to CO2 (gb, mol/m2/s). Environmental inputs must be scalar. The argument
 `net` indicates whether the net or gross CO2 assimilation should be returned.
 """
-function photosynthesis(p::C3; PAR = 1000.0, RH = 0.75, Tleaf = 298.0, Ca = 400.0, O2 = 210e3, gb = 0.5, net = true)
+function photosynthesis(p::C3;
+    PAR = 1000.0,
+    RH = 0.75,
+    Tleaf = 298.0,
+    Ca = 400.0,
+    O2 = 210e3,
+    gb = 0.5,
+    net = true)
     photosynthesis(p, PAR, RH, Tleaf, Ca, O2, gb, net)
 end
-function photosynthesis(p::C3Q; PAR = 1000.0μmol/m^2/s, RH = 0.75, Tleaf = 298.0K, 
-              Ca = 400.0μmol/mol, O2 = 210e3μmol/mol, gb = 0.5mol/m^2/s, net = true)
+function photosynthesis(p::C3Q; PAR = 1000.0μmol / m^2 / s, RH = 0.75, Tleaf = 298.0K,
+    Ca = 400.0μmol / mol, O2 = 210e3μmol / mol, gb = 0.5mol / m^2 / s, net = true)
     photosynthesis(p, PAR, RH, Tleaf, Ca, O2, gb, net)
 end
 
 function photosynthesis(p::C3Type, PAR, RH, Tleaf, Ca, O2, gb, net)
     # Calculate VPD at leaf temperature (kPa)
     vpd = VPD(Tleaf, RH)
-    fvpd = max(1.0/(1.0/(p.a1 - p.b1*vpd) - 1.0),0.0)
+    fvpd = max(1.0 / (1.0 / (p.a1 - p.b1 * vpd) - 1.0), 0.0)
 
     # Calculate values of parameters at Tleaf
     Rd = arrhenius(p.Rd25, p.E_Rd, Tleaf) # μmol/m2/s
@@ -228,58 +235,57 @@ function photosynthesis(p::C3Type, PAR, RH, Tleaf, Ca, O2, gb, net)
     gm = peaked(p.gm25, p.E_gm, p.D_gm, p.S_gm, Tleaf) # mol/m2/s
 
     # Parameters for CO2 diffusion
-    gamma_star = 0.5*O2/Sco # μmol/mol
-    Ci_star = gamma_star - Rd/gm # μmol/mol
+    gamma_star = 0.5 * O2 / Sco # μmol/mol
+    Ci_star = gamma_star - Rd / gm # μmol/mol
 
     # Photosynthesis limited by Rubisco
     x1_c = Vcmax # μmol/m2/s
-    x2_c = Kmc*(1 + O2/Kmo) # μmol/mol
+    x2_c = Kmc * (1 + O2 / Kmo) # μmol/mol
     Ac = solveAC3(gm, gb, p.gso, fvpd, x2_c, x1_c, gamma_star, Rd, Ca) # μmol/m2/s
 
     # Limitation by electron transport
-    alpha = p.simpleJ ? p.k2ll : p.Phi2*p.sigma2*p.beta*(1 - p.fpseudo/(1 - p.fcyc))
-    J = (alpha*PAR + Jmax - sqrt((alpha*PAR + Jmax)^2.0 - 4.0*p.theta*alpha*Jmax*PAR))/(2*p.theta) # μmol/m2/s
-    x1_j = J/4.0 # μmol/m2/s
-    x2_j = 2*gamma_star # μmol/mol
+    alpha = p.simpleJ ? p.k2ll : p.Phi2 * p.sigma2 * p.beta * (1 - p.fpseudo / (1 - p.fcyc))
+    J = (alpha * PAR + Jmax -
+         sqrt((alpha * PAR + Jmax)^2.0 - 4.0 * p.theta * alpha * Jmax * PAR)) /
+        (2 * p.theta) # μmol/m2/s
+    x1_j = J / 4.0 # μmol/m2/s
+    x2_j = 2 * gamma_star # μmol/mol
     Aj = solveAC3(gm, gb, p.gso, fvpd, x2_j, x1_j, gamma_star, Rd, Ca) # μmol/m2/s
 
     # Limitation by TPU
-    Ap = 3.0*TPU - Rd # μmol/m2/s
+    Ap = 3.0 * TPU - Rd # μmol/m2/s
 
     # Minimum of three potential rates
-    An = min(Ac,min(Aj,Ap)) # μmol/m2/s
+    An = min(Ac, min(Aj, Ap)) # μmol/m2/s
 
     # Stomatal conductance
-    gsc = solvegs(p.gso,  An,  Ca, Ci_star,  Rd,  fvpd, gb) # mol/m2/s
-    
+    gsc = solvegs(p.gso, An, Ca, Ci_star, Rd, fvpd, gb) # mol/m2/s
+
     # Choose the right output
     A = net ? An : An + Rd
-    return (A = A, gs = gsc) 
-
+    return (A = A, gs = gsc)
 end
-
 
 # Analytical solution of cubic equation due to coupling of A, gb, gs and gm
 function solveAC3(gm, gb, gso, fvpd, x2, x1, gamma_star, Rd, Ca)
-    a = gso*(x2 + gamma_star) + (gso/gm + fvpd)*(x1 - Rd)
-    b = Ca*(x1 - Rd) - gamma_star*x1 - Rd*x2
-    c = Ca + x2 + (x1 - Rd)*(1/gm + 1/gb)
-    d = x2 + gamma_star + (x1 - Rd)/gm
-    m = 1/gm + (gso/gm + fvpd)*(1/gm + 1/gb)
-    p = -(d + (x1 - Rd)/gm + a*(1/gm + 1/gb) + (gso/gm + fvpd)*c)/m
-    q = (d*(x1 - Rd) + a*c + (gso/gm + fvpd)*b)/m
-    r = (-a*b)/m
-    U = (2*p^3 - 9*p*q + 27*r)/54
-    Q = (p^2 - 3*q)/9
-    psi = acos(min(1.0, U/sqrt(Q^3)))
-    A = -2*sqrt(Q)*cos(psi/3) - p/3
-  end
-  
+    a = gso * (x2 + gamma_star) + (gso / gm + fvpd) * (x1 - Rd)
+    b = Ca * (x1 - Rd) - gamma_star * x1 - Rd * x2
+    c = Ca + x2 + (x1 - Rd) * (1 / gm + 1 / gb)
+    d = x2 + gamma_star + (x1 - Rd) / gm
+    m = 1 / gm + (gso / gm + fvpd) * (1 / gm + 1 / gb)
+    p = -(d + (x1 - Rd) / gm + a * (1 / gm + 1 / gb) + (gso / gm + fvpd) * c) / m
+    q = (d * (x1 - Rd) + a * c + (gso / gm + fvpd) * b) / m
+    r = (-a * b) / m
+    U = (2 * p^3 - 9 * p * q + 27 * r) / 54
+    Q = (p^2 - 3 * q) / 9
+    psi = acos(min(1.0, U / sqrt(Q^3)))
+    A = -2 * sqrt(Q) * cos(psi / 3) - p / 3
+end
+
 # Calculate gs once A is known
 function solvegs(gso, A, Ca, Ci_star, Rd, fvpd, gb)
-    a = Ca - A/gb - Ci_star
-    b = -A - Ca*gso + gso*Ci_star - (A + Rd)*fvpd
-    c = A*gso
-    A = (-b - sqrt(b*b - 4*a*c))/(2*a)
-  end
-  
+    a = Ca - A / gb - Ci_star
+    b = -A - Ca * gso + gso * Ci_star - (A + Rd) * fvpd
+    c = A * gso
+    A = (-b - sqrt(b * b - 4 * a * c)) / (2 * a)
+end

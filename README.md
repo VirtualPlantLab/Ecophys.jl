@@ -1,20 +1,35 @@
 # Ecophys
 
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://VirtualPlantLab.github.io/Ecophys.jl/stable/)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://VirtualPlantLab.github.io/Ecophys.jl/dev/)
+[![CI](https://github.com/VirtualPlantLab/Ecophys.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/VirtualPlantLab/Ecophys.jl/actions/workflows/CI.yml)
+[![Coverage](https://codecov.io/gh/VirtualPlantLab/Ecophys.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/VirtualPlantLab/Ecophys.jl)
+[![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
+[![ColPrac: Contributor's Guide on Collaborative Practices for Community Packages](https://img.shields.io/badge/ColPrac-Contributor's%20Guide-blueviolet)](https://github.com/SciML/ColPrac)
+[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+
 **This package is still in development**
 
-This package contains modules describing different ecophysiological functions of 
-plants, including processes such as photosynthesis, respiration, transpiration 
+This package contains modules describing different ecophysiological functions of
+plants, including processes such as photosynthesis, respiration, transpiration
 or phenology. They may be used as standalone or as a component of a plant growth
 model.
 
 ## Installation
 
-The package Ecophys is not in the Julia registry. To install it, you can use the 
-following command:
+To install Ecophys.jl, you can use the following command:
 
 ```julia
-Pkg.add(url = "https://github.com/AleMorales/Ecophys.jl.git")
+] add Ecophys
 ```
+
+Or, if you prefer the development version:
+
+```julia
+import Pkg
+Pkg.add(url = "https://github.com/VirtualPlantLab/Ecophys.jl.git", rev = "master")
+```
+
 ## Photosynthesis
 
 The module Photosynthesis contains functions to calculate leaf CO2 assimilation
@@ -27,7 +42,7 @@ using Ecophys
 c3 = C3(Vcmax25 = 140.0)
 c4 = C4(Vcmax25 = 140.0)
 ```
-To compute CO2 assimilation and stomatal conductance, use the `photosynthesis()` function, 
+To compute CO2 assimilation and stomatal conductance, use the `photosynthesis()` function,
 passing the photosynthesis model and the environmental conditions as inputs (with
 defaults):
 
@@ -36,7 +51,7 @@ A_c3, gs_c3  = photosynthesis(c3, PAR = 100.0)
 A_c4, gs_c4  = photosynthesis(c4, PAR = 100.0)
 ```
 
-It is also possible to work with physical units using the Unitful.jl package. In 
+It is also possible to work with physical units using the Unitful.jl package. In
 such case, the functions `C3Q()` and `C4Q` should be used to create the model but
 now the parameters are stored as `Quantity` objects:
 
@@ -57,10 +72,10 @@ A_c4, gs_c4  = photosynthesis(c4Q, PAR = 100.0μmol/m^2/s)
 
 ## Leaf Energy Balance
 
-Ecophys may also compute the leaf energy balance to couple photosynthesis, 
+Ecophys may also compute the leaf energy balance to couple photosynthesis,
 transpiration and leaf temperature. In addition to the models of photosynthesis
 and stomatal conductance mentioned in the above, additional models of boundary
-layer conductance and leaf optical properties are required. 
+layer conductance and leaf optical properties are required.
 
 Currently, only a simple model of optical properties is avaiable that defines
 the leaf absorptance in PAR and NIR and its emmisivity in the thermal domain.
@@ -83,8 +98,8 @@ gbQ = simplegbQ(d = 0.1m)
 
 The second model is more complex as it takes into account the aspect ratio (length/width) of
 the leaf as well as its inclination angle. It will also distinguish between the
-boundary layer conductance of the front and back side of the leaf. This model 
-relies on unpublished equations fitted to the data reviewed by 
+boundary layer conductance of the front and back side of the leaf. This model
+relies on unpublished equations fitted to the data reviewed by
 [Schuepp (1993, New Phyto)](https://nph.onlinelibrary.wiley.com/doi/10.1111/j.1469-8137.1993.tb03898.x):
 
 ```julia
