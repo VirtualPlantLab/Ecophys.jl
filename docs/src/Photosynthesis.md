@@ -5,33 +5,20 @@
 CurrentModule = Ecophys.Photosynthesis
 ```
 
+## API documentation
 
-## CO2 assimilation and stomatal conductance 
-
-```@docs
-C3
-C3Q
-C4
-C4Q
-photosynthesis
+```@autodocs
+Modules = [Photosynthesis]
+Public = true
+Private = false
 ```
 
-## Boundary layer conductance
+## Un-exported
 
-```@docs
-gb
-simplegb
-simplegbQ
-gbAngle
-gbAngleQ
+Private functions, types or constants from `Photosynthesis`. These are not exported, so you need to prefix the function name with `Photosynthesis.` to access them:
+
+```@autodocs
+Modules = [Photosynthesis]
+Public = false
+Private = true
 ```
-
-## Energy balance
-
-```@docs
-SimpleOptical
-energybalance
-solve_energy_balance
-transpiration
-```
-

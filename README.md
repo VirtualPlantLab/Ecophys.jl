@@ -1,7 +1,7 @@
 # Ecophys
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://VirtualPlantLab.github.io/Ecophys.jl/stable/)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://VirtualPlantLab.github.io/Ecophys.jl/dev/)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://virtualplantlab.com/stable/Ecophys/)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://virtualplantlab.com/dev/Ecophys/)
 [![CI](https://github.com/VirtualPlantLab/Ecophys.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/VirtualPlantLab/Ecophys.jl/actions/workflows/CI.yml)
 [![Coverage](https://codecov.io/gh/VirtualPlantLab/Ecophys.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/VirtualPlantLab/Ecophys.jl)
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
