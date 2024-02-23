@@ -109,7 +109,7 @@ gbangQ = gbAngleQ(d = 0.1m, ang = π/4, ar = 0.1)
 
 The leaf energy balance is then computed using `solve_energy_balance()` which
 will compute the leaf temperature that closes the energy balance as well as the
-corresponding CO2 assimilationa and transpiration:
+corresponding CO2 assimilation and transpiration:
 
 ```julia
 Tleaf, A, Tr = solve_energy_balance(c3; gb = gb, opt = opt, PAR = 100.0, ws = 5.0)

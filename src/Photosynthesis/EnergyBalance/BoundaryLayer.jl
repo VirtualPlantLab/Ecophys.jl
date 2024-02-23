@@ -22,7 +22,7 @@ Compute boundary layer conductance for heat, water vapor and CO2.
 - `P`: Air pressure (Pa)
 
 # Returns
-- `gbh`: Boundary layer conductance for heat (W/m²/K)
+- `gbh`: Boundary layer conductance for heat (mol/m2/s)
 - `gbw`: Boundary layer conductance for water vapor (mol/m²/s)
 - `gbc`: Boundary layer conductance for CO2 (mol/m²/s)
 """
@@ -38,7 +38,7 @@ function gb(p::gbType, ws, Tleaf, Tair, P)
     R = GasConstant(mode)
 
     # Nusselt number under free convection
-    # DO NOT USE EXPONENTIATION BECAUSE IT MESSES UP INTEGRATION WITH UNITFUL.JL    
+    # DO NOT USE EXPONENTIATION BECAUSE IT MESSES UP INTEGRATION WITH UNITFUL.JL
     Gr::Float64 = a * g * p.d * p.d * p.d * abs(Tleaf - Tair) / (ν * ν) # Grashof number
     Nufree::Float64 = 0.5 * Gr^0.25 # Horizontal flat plate - laminar flow
 
@@ -50,7 +50,6 @@ function gb(p::gbType, ws, Tleaf, Tair, P)
 
     # Mixed convection formula proposed by Schuepp (1993)
     Nu::Float64 = (Nufree^3.5 + Nuforced^3.5)^(1 / 3.5)
-
     # Boundary layer conductances
     gbh = Nu * k / p.d / Mv
     gbw = gbh / 0.93
@@ -107,9 +106,9 @@ end
 
 abstract type gbAngleType <: gbType end
 """
-    gbAngle(; d = 0.01, ang = 0.0, ar = 1.0, fangm = 1.381, fangk = 0.034, 
-    α = 2.738, b0_0 = 0.455, d_b0 = 2.625, b0_n = 0.373, b0_KAR = 28.125,  db_0 = 0.085, 
-    d_db = 0.437, db_n = 5.175, db_KAR = 0.884,  β_0 = 3.362, d_β = 17.664, β_n = 4.727, 
+    gbAngle(; d = 0.01, ang = 0.0, ar = 1.0, fangm = 1.381, fangk = 0.034,
+    α = 2.738, b0_0 = 0.455, d_b0 = 2.625, b0_n = 0.373, b0_KAR = 28.125,  db_0 = 0.085,
+    d_db = 0.437, db_n = 5.175, db_KAR = 0.884,  β_0 = 3.362, d_β = 17.664, β_n = 4.727,
     β_KAR = 0.677)
 
 Model of boundary layer conductance that accounts for inclination angle and leaf
@@ -162,9 +161,9 @@ Base.@kwdef struct gbAngle{T <: Real} <: gbAngleType
 end
 
 """
-    gbAngleQ(; d = 0.01m, ang = 0.0, ar = 1.0, fangm = 1.381, fangk = 0.034, 
-    α = 2.738, b0_0 = 0.455, d_b0 = 2.625, b0_n = 0.373, b0_KAR = 28.125,  db_0 = 0.085, 
-    d_db = 0.437, db_n = 5.175, db_KAR = 0.884,  β_0 = 3.362, d_β = 17.664, β_n = 4.727, 
+    gbAngleQ(; d = 0.01m, ang = 0.0, ar = 1.0, fangm = 1.381, fangk = 0.034,
+    α = 2.738, b0_0 = 0.455, d_b0 = 2.625, b0_n = 0.373, b0_KAR = 28.125,  db_0 = 0.085,
+    d_db = 0.437, db_n = 5.175, db_KAR = 0.884,  β_0 = 3.362, d_β = 17.664, β_n = 4.727,
     β_KAR = 0.677)
 
 Model of boundary layer conductance that accounts for inclination angle and leaf
