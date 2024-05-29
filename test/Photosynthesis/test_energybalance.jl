@@ -9,7 +9,7 @@ using Roots
 ################################################# C3 leaves #################################################
 #############################################################################################################
 
-#let 
+let
 
 # Without units
 opt = PH.SimpleOptical()
@@ -27,7 +27,7 @@ O2 = 210e3 # μmol/mol
 res = PH.energybalance(Tl, gb, c3, opt, PAR, NIR, ws, RH, Tair, Ca, P, O2) # W/m^2
 Tl = PH.solve_energy_balance(c3, gb = gb, opt = opt, PAR = PAR, NIR = NIR,
     ws = ws, RH = RH, Tair = Tair, Ca = Ca, P = P, O2 = O2,
-    xatol = 0.01, order = Order2())
+    xatol = 0.01, order = Order2()).Tleaf
 
 # With units
 opt = PH.SimpleOptical()
@@ -41,7 +41,7 @@ PAR_q = PAR * μmol / m^2 / s
 NIR_q = NIR * W / m^2
 RH_q = RH
 Ca_q = Ca * μmol / mol
-O2_q = O2 * mmol / mol
+O2_q = O2 * μmol / mol
 res_q = PH.energybalance(Tl_q,
     gb_q,
     c3_q,
@@ -54,12 +54,12 @@ res_q = PH.energybalance(Tl_q,
     Ca_q,
     P_q,
     O2_q) # W/m^2
-@test_broken res_q == res * W / m^2
+@test res_q ≈ res * W / m^2
 Tl_q = PH.solve_energy_balance(c3_q, gb = gb_q, opt = opt, PAR = PAR_q,
     NIR = NIR_q, ws = ws_q, RH = RH_q, Tair = Ta_q,
     Ca = Ca_q, P = P_q, O2 = O2_q, xatol = 0.01,
-    order = Order2())
-@test_broken abs(Tl_q - Tl * K) < 1e-4K
+    order = Order2()).Tleaf
+@test Tl_q ≈ Tl * K
 
 # With effect of angles (horizontal)
 gb_q = PH.gbAngleQ()
@@ -76,34 +76,12 @@ res_q = PH.energybalance(Tl_q,
     Ca_q,
     P_q,
     O2_q) # W/m^2
-@test_broken res_q == res * W / m^2
+@test res_q ≈ res * W / m^2
 Tl_q = PH.solve_energy_balance(c3_q, gb = gb_q, opt = opt, PAR = PAR_q,
     NIR = NIR_q, ws = ws_q, RH = RH_q, Tair = Ta_q,
     Ca = Ca_q, P = P_q, O2 = O2_q, xatol = 0.01,
-    order = Order2())
-@test_broken abs(Tl_q - Tl * K) < 1e-4K
-
-# With effect of angles (45°)
-gb_q = PH.gbAngleQ(ang = 45.0)
-Tl_q = 300.0K
-res_q = PH.energybalance(Tl_q,
-    gb_q,
-    c3_q,
-    opt,
-    PAR_q,
-    NIR_q,
-    ws_q,
-    RH_q,
-    Ta_q,
-    Ca_q,
-    P_q,
-    O2_q) # W/m^2
-@test_broken abs(res_q - 175.3157W / m^2) < 1e-4W / m^2
-Tl_q = PH.solve_energy_balance(c3_q, gb = gb_q, opt = opt, PAR = PAR_q,
-    NIR = NIR_q, ws = ws_q, RH = RH_q, Tair = Ta_q,
-    Ca = Ca_q, P = P_q, O2 = O2_q, xatol = 0.01,
-    order = Order2())
-@test_broken abs(Tl_q - 306.3603K) < 1e-4K
+    order = Order2()).Tleaf
+@test Tl_q ≈ Tl * K
 
 #############################################################################################################
 ################################################# C4 leaves #################################################
@@ -115,7 +93,7 @@ Tl = 300.0
 res = PH.energybalance(Tl, gb, c4, opt, PAR, NIR, ws, RH, Tair, Ca, P, O2) # W/m^2
 Tl = PH.solve_energy_balance(c4, gb = gb, opt = opt, PAR = PAR, NIR = NIR,
     ws = ws, RH = RH, Tair = Tair, Ca = Ca, P = P, O2 = O2,
-    xatol = 0.01, order = Order2())
+    xatol = 0.01, order = Order2()).Tleaf
 
 # With units
 c4_q = PH.C4Q()
@@ -133,12 +111,12 @@ res_q = PH.energybalance(Tl_q,
     Ca_q,
     P_q,
     O2_q) # W/m^2
-@test_broken res_q == res * W / m^2
+@test res_q ≈ res * W / m^2
 Tl_q = PH.solve_energy_balance(c4_q, gb = gb_q, opt = opt, PAR = PAR_q,
     NIR = NIR_q, ws = ws_q, RH = RH_q, Tair = Ta_q,
     Ca = Ca_q, P = P_q, O2 = O2_q, xatol = 0.01,
-    order = Order2())
-@test_broken abs(Tl_q - Tl * K) < 1e-4K
+    order = Order2()).Tleaf
+@test Tl_q ≈ Tl * K
 
 # With effect of angles (horizontal)
 gb_q = PH.gbAngleQ()
@@ -155,33 +133,11 @@ res_q = PH.energybalance(Tl_q,
     Ca_q,
     P_q,
     O2_q) # W/m^2
-@test_broken res_q == res * W / m^2
+@test res_q ≈ res * W / m^2
 Tl_q = PH.solve_energy_balance(c4_q, gb = gb_q, opt = opt, PAR = PAR_q,
     NIR = NIR_q, ws = ws_q, RH = RH_q, Tair = Ta_q,
     Ca = Ca_q, P = P_q, O2 = O2_q, xatol = 0.01,
-    order = Order2())
-@test_broken abs(Tl_q - Tl * K) < 1e-4K
+    order = Order2()).Tleaf
+@test Tl_q ≈ Tl * K
 
-# With effect of angles (45°)
-gb_q = PH.gbAngleQ(ang = 45.0)
-Tl_q = 300.0K
-res_q = PH.energybalance(Tl_q,
-    gb_q,
-    c4_q,
-    opt,
-    PAR_q,
-    NIR_q,
-    ws_q,
-    RH_q,
-    Ta_q,
-    Ca_q,
-    P_q,
-    O2_q) # W/m^2
-@test_broken abs(res_q - 175.4809W / m^2) < 1e-4W / m^2
-Tl_q = PH.solve_energy_balance(c4_q, gb = gb_q, opt = opt, PAR = PAR_q,
-    NIR = NIR_q, ws = ws_q, RH = RH_q, Tair = Ta_q,
-    Ca = Ca_q, P = P_q, O2 = O2_q, xatol = 0.01,
-    order = Order2())
-@test_broken abs(Tl_q - 306.3663K) < 1e-4K
-
-#end
+end

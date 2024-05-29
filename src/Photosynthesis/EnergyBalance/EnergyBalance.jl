@@ -45,7 +45,7 @@ Calculate the energy balance of a leaf.
 
 # Details
 
-Inputs maybe be either `Real` or `Quantity` types (i.e., with physical units). 
+Inputs maybe be either `Real` or `Quantity` types (i.e., with physical units).
 If `Quantity` types are used, the output will be a `Quantity` type.
 """
 function energybalance(Tleaf, pgb, pAgs, pEb, PAR, NIR, ws, RH, Tair, Ca, P, O2)
@@ -90,16 +90,16 @@ function thermal(Tleaf, p::Optical)
 end
 
 """
-    solve_energy_balance(Ags::Union{C3Q, C4Q}; gb = simplegbQ(), 
-                         opt = SimpleOptical(), PAR = 1000.0μmol/m^2/s, 
-                         NIR = 250.0W/m^2, ws = 1.0m/s, RH = 0.75, 
-                         Tair = 298.0K, Ca = 400.0μmol/mol, P = 101.0kPa, 
-                         O2 = 210.0mmol/mol, order = Order2(), xatol = 0.01, 
+    solve_energy_balance(Ags::Union{C3Q, C4Q}; gb = simplegbQ(),
+                         opt = SimpleOptical(), PAR = 1000.0μmol/m^2/s,
+                         NIR = 250.0W/m^2, ws = 1.0m/s, RH = 0.75,
+                         Tair = 298.0K, Ca = 400.0μmol/mol, P = 101.0kPa,
+                         O2 = 210.0mmol/mol, order = Order2(), xatol = 0.01,
                          maxfnevals = 100, net = true)
-    solve_energy_balance(Ags::Union{C3, C4}; gb = simplegb(), 
-                         opt = SimpleOptical(), PAR = 1000.0, NIR = 250.0, 
-                         ws = 1.0, RH = 0.75, Tair = 298.0, Ca = 400.0, 
-                         P = 101.0e3, O2 = 210.0e3, order = Order2(), xatol = 0.01, 
+    solve_energy_balance(Ags::Union{C3, C4}; gb = simplegb(),
+                         opt = SimpleOptical(), PAR = 1000.0, NIR = 250.0,
+                         ws = 1.0, RH = 0.75, Tair = 298.0, Ca = 400.0,
+                         P = 101.0e3, O2 = 210.0e3, order = Order2(), xatol = 0.01,
                          maxfnevals = 100, net = true)
 
 Solve the leaf energy balance coupled to photosynthesis and transpiration.
@@ -125,14 +125,14 @@ Solve the leaf energy balance coupled to photosynthesis and transpiration.
 
 # Details
 
-Inputs maybe be either `Real` or `Quantity` types from Unitful.jl (i.e., with 
-physical units). If `Quantity` types are used, the output will be a `Quantity` 
+Inputs maybe be either `Real` or `Quantity` types from Unitful.jl (i.e., with
+physical units). If `Quantity` types are used, the output will be a `Quantity`
 type.
 
 # Returns
 
-A named tuple with net CO2 assimilation (`An`, μmol/m^2/s), gross CO2 
-assimilation (`Ag`, μmol/m^2/s), transpiration (`Tr`, mol/m^2/s) and leaf 
+A named tuple with net CO2 assimilation (`An`, μmol/m^2/s), gross CO2
+assimilation (`Ag`, μmol/m^2/s), transpiration (`Tr`, mol/m^2/s) and leaf
 temperature (`Tleaf`, K).
 """
 function solve_energy_balance(Ags::Union{C3Q, C4Q}; gb = simplegbQ(),
@@ -155,7 +155,6 @@ end
 
 function solve_energy_balance(pAgs, pgb, pEb, PAR, NIR, ws, RH, Tair, Ca, P, O2,
     order = Order2(), xatol = 0.01, maxfnevals = 100, net = true)
-    println("Currently solving the energy balance without units is broken (produces wrong results).")
     # Find the temperature
     Tleaf = find_zero(x -> energybalance(x,
             pgb,
@@ -236,7 +235,7 @@ end
     transpiration(;gsw = 0.1, gbw = 1.0, Tleaf = 300.0, Tair = 298.0, P = 101e3,
                    RH = 0.75)
 
-Compute transpiration rate (mol/m^2/s) from conductance to water vapor and 
+Compute transpiration rate (mol/m^2/s) from conductance to water vapor and
 environmental variables.
 
 # Arguments
