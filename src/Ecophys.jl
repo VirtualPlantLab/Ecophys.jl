@@ -1,7 +1,8 @@
 module Ecophys
 
 export C3, C3Q, C4, C4Q, SimpleOptical, energybalance, solve_energy_balance, gb,
-    simplegb, simplegbQ, gbAngle, gbAngleQ, photosynthesis, transpiration
+    simplegb, simplegbQ, gbAngle, gbAngleQ, photosynthesis, transpiration,
+    compute_ASRQ, compute_potential_GR, Organ, OrganQ
 
 # Photosynthesis models
 include("Photosynthesis/Photosynthesis.jl")
