@@ -1,7 +1,7 @@
 module Growth
 
-#General abstract type for growth models
-abstract type Organ end
+import Unitful: Quantity, dimension, °C, g, ustrip, @u_str
+import StaticArrays: @SVector
 
 #Functions and data structures shared by growth models
 include("GrowthModels.jl")

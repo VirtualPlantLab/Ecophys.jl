@@ -4,7 +4,7 @@
 # Organ, OrganQ
 # compute_potential_GR
 
-abstract type OrganType <: Organ end
+abstract type OrganType end
 
 """
     Organ(f = [0.53, 0.25, 0.05, 0.05, 0.06, 0.06],
