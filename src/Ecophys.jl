@@ -5,7 +5,7 @@ export C3, C3Q, C4, C4Q, SimpleOptical, energybalance, solve_energy_balance, gb,
 
 # Photosynthesis models
 include("Photosynthesis/Photosynthesis.jl")
-include("Growth.jl")
+include("Growth/Growth.jl")
 
 # Photosynthesis
 const photosynthesis = Photosynthesis.photosynthesis
@@ -22,7 +22,7 @@ const gb = Photosynthesis.gb
 const energybalance = Photosynthesis.energybalance
 const solve_energy_balance = Photosynthesis.solve_energy_balance
 const transpiration = Photosynthesis.transpiration
-# Growth 
+# Growth
 const compute_ASRQ = Growth.compute_ASRQ
 const compute_potential_GR = Growth.compute_potential_GR
 const Organ = Growth.Organ
