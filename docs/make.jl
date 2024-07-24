@@ -13,6 +13,7 @@ makedocs(;
         assets = String[]),
     pages = [
         "Photosynthesis" => "Photosynthesis.md",
+        "Growth" => "Growth.md"
     ])
 
 deploydocs(;
