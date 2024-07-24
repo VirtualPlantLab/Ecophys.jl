@@ -1,11 +1,11 @@
 
-# Module Photosynthesis
+# Photosynthesis
 
 ```@meta
 CurrentModule = Ecophys.Photosynthesis
 ```
 
-## API documentation
+## Public API
 
 ```@autodocs
 Modules = [Photosynthesis]
@@ -13,9 +13,9 @@ Public = true
 Private = false
 ```
 
-## Un-exported
+## Private
 
-Private functions, types or constants from `Photosynthesis`. These are not exported, so you need to prefix the function name with `Photosynthesis.` to access them:
+Private functions, types or constants from `Photosynthesis`. These are not exported, so you need to prefix the function name with `Ecophys.` to access them. Also bear in mind that these are not part of the public API, so they may change without notice.
 
 ```@autodocs
 Modules = [Photosynthesis]

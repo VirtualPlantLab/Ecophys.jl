@@ -1,9 +1,10 @@
-using Ecophys
+import Ecophys
+import Ecophys.Photosynthesis, Ecophys.Growth
 using Documenter
 
 makedocs(;
     doctest = false,
-    modules = [Ecophys],
+    modules = [Ecophys.Photosynthesis, Ecophys.Growth],
     authors = "Alejandro Morales Sierra <alejandro.moralessierra@wur.nl> and contributors",
     repo = "https://github.com/VirtualPlantLab/Ecophys.jl/blob/{commit}{path}#{line}",
     sitename = "Ecophys.jl",
