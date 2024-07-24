@@ -1,7 +1,7 @@
 name = "Ecophys"
 uuid = "19467474-d12d-47c9-939f-3e50fbfd93ad"
 authors = ["Alejandro Morales <alejandro.moralessierra@wur.nl> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
