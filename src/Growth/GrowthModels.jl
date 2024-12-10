@@ -40,7 +40,7 @@ end
 """
     compute_potential_GR(par::OrganType)
 
-Compute potential growth rate of the leaf according to thermal time (Yin et al 2003)
+Compute potential growth rate according to thermal time using a Sigmoid model (Yin et al 2003)
 The potential growth rate is computed as a function of thermal time (tt, DD), and the parameters of the growth model:
     - time at which growth rate extinguishes (te, DD),
     - time at which growth rate is maximum (tm, DD)
@@ -49,7 +49,9 @@ The potential growth rate is computed as a function of thermal time (tt, DD), an
 
 Citations:
 Yin, Xinyou & Goudriaan, Jan & Lantinga, Egbert & Vos, Jan & Spiertz, Huub. (2003). A Flexible Sigmoid Function of Determinate Growth. Annals of botany. 91. 361-71. 10.1093/aob/mcg029.
+
 """
+
 function compute_potential_GR(t = 20.0, te = 100.0, tm = 50.0, tb = 10.0, wmax = 0.1)
     #Compute maximum growth rate
     cm = wmax * ((2 * te - tm) / (te * (te - tm))) * (tm / te) ^ (tm / (tm - te))
@@ -70,7 +72,11 @@ function compute_potential_GR(par::OrganQ)
     return compute_potential_GR(t, te, tm, tb, wmax)*u"g/d"
 end
 
-#Example of compute_c using different data types as input:
-compute_potential_GR()
-compute_potential_GR(Organ())
-compute_potential_GR(OrganQ())
+"""
+    Example of using compute_potential_GR using different data types as input:
+
+        compute_potential_GR()
+        compute_potential_GR(Organ())
+        compute_potential_GR(OrganQ())
+
+"""
