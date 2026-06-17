@@ -7,11 +7,11 @@ abstract type C4Type <: FvCB end
 # Data structure to store all the C4 parameters without units
 
 """
-    C4(Sco25 = 2590.0, E_Sco = -24.46e3, Kmc25 = 650.0, E_Kmc = 79.43e3, Kmo25 = 450e3, 
-       E_Kmo = 36380.0, Vcmax25 = 120.0, E_Vcmax = 65.33, theta = 0.7, Phi2 = 0.83, sigma2 = 0.5, 
-       beta = 0.85, fQ = 1.0, fpseudo = 0.1, h = 4.0, Jmax25 = 230.0, E_Jmax = 48e3, D_Jmax = 200e3, 
-       S_Jmax = 630.0, x = 0.4, alpha = 0.1, kp25 = 0.7, E_kp = 46.39e3, gbs = 0.003, Rd25 = 1.2, 
-       E_Rd = 46.39e3, gso = 0.01, a1 = 0.9, b1 = 0.15e-3)
+    C4(Sco25 = 2590.0, E_Sco = -24.46e3, Kmc25 = 650.0, E_Kmc = 79.43e3, Kmo25 = 450e3,
+       E_Kmo = 36380.0, Vcmax25 = 120.0, E_Vcmax = 65.33, theta = 0.7, Phi2 = 0.83, sigma2 = 0.5,
+       beta = 0.85, fQ = 1.0, fpseudo = 0.1, h = 4.0, Jmax25 = 230.0, E_Jmax = 48e3, D_Jmax = 200e3,
+       S_Jmax = 630.0, x = 0.4, alpha = 0.1, kp25 = 0.7, E_kp = 46.39e3, gbs = 0.003, Rd25 = 1.2,
+       E_Rd = 46.39e3, gso = 0.01, a1 = 0.9, b1 = 0.15)
 
 Data structure to store all the parameters for the C3 photosynthesis model.
 
@@ -81,16 +81,16 @@ Base.@kwdef mutable struct C4{T <: Real} <: C4Type
     # Stomatal conductance
     gso::T = 0.01 # Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s)
     a1::T = 0.9 # Empirical parameter in gs formula
-    b1::T = 0.15e-3 # Empirical parameter in gs formula (1/kPa)
+    b1::T = 0.15 # Empirical parameter in gs formula (1/kPa)
 end
 
 """
     C4(Sco25 = 2590.0, E_Sco = -24.46e3J/mol, Kmc25 = 650.0μmol/mol, E_Kmc = 79.43e3J/mol,
        Kmo25 = 450e3μmol/mol, E_Kmo = 36380.0J/mol, Vcmax25 = 120.0μmol/m^2/s, E_Vcmax = 65.33J/mol,
-       theta = 0.7, Phi2 = 0.83, sigma2 = 0.5, beta = 0.85, fQ = 1.0, fpseudo = 0.1, h = 4.0, 
-       Jmax25 = 230.0μmol/m^2/s, E_Jmax = 48e3J/mol, D_Jmax = 200e3J/mol, S_Jmax = 630.0J/mol/K, 
-       x = 0.4, alpha = 0.1, kp25 = 0.7mol/m^2/s, E_kp = 46.39e3J/mol, gbs = 0.003mol/m^2/s, 
-       Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol, gso = 0.01mol/m^2/s, a1 = 0.9, b1 = 0.15e-3/Pa)
+       theta = 0.7, Phi2 = 0.83, sigma2 = 0.5, beta = 0.85, fQ = 1.0, fpseudo = 0.1, h = 4.0,
+       Jmax25 = 230.0μmol/m^2/s, E_Jmax = 48e3J/mol, D_Jmax = 200e3J/mol, S_Jmax = 630.0J/mol/K,
+       x = 0.4, alpha = 0.1, kp25 = 0.7mol/m^2/s, E_kp = 46.39e3J/mol, gbs = 0.003mol/m^2/s,
+       Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol, gso = 0.01mol/m^2/s, a1 = 0.9, b1 = 0.15/kPa)
 
 Data structure to store all the parameters for the C4 photosynthesis model using
 `Quantity` objects from Unitful.jl.
@@ -161,7 +161,7 @@ Base.@kwdef mutable struct C4Q{T <: Real} <: C4Type
     # Stomatal conductance
     gso::Quantity{T, dimension(mol / m^2 / s)} = 0.01mol / m^2 / s # Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s)
     a1::T = 0.9 # Empirical parameter in gs formula
-    b1::Quantity{T, dimension(1 / kPa)} = 0.15e-3 / Pa # Empirical parameter in gs formula (1/kPa)
+    b1::Quantity{T, dimension(1 / kPa)} = 0.15 / kPa # Empirical parameter in gs formula (1/kPa)
 end
 
 function photosynthesis(p::C4;
@@ -306,8 +306,9 @@ function photosynthesis(p::C4Type, PAR, RH, Tleaf, Ca, O2, gb, net)
     Aj = min(Aj1, Aj2)
     An = min(Ac, Aj)
 
-    # Stomatal conductance
-    gsc = solvegs(p.gso, An, Ca, Cs_star, Rd, fvpd, gb) # mol/m2/s
+    # Stomatal conductance (using Cs_star instead of Ci_star)
+    Ci = CalcCi(p.gso, An, Ca, Cs_star, Rd, fvpd)
+    gsc = p.gso + ((An + Rd)/(Ci - Cs_star))*fvpd
 
     # Choose the right output
     A = net ? An : An + Rd

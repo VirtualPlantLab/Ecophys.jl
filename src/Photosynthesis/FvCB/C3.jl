@@ -7,14 +7,14 @@ abstract type FvCB <: Ags end
 abstract type C3Type <: FvCB end
 
 """
-    C3(Sco25 = 2800.0, E_Sco = -24.46e3, Kmc25 = 270.0, E_Kmc = 80.99e3, 
-        Kmo25 = 165.0e3, E_Kmo = 23.72e3, Vcmax25 = 120.0, E_Vcmax = 65.33e3, 
-        simpleJ = false, k2ll = 0.35, theta = 0.7, Phi2 = 0.82, sigma2 = 0.5, 
-        beta = 0.85, fcyc = 0.1, 
-        fpseudo = 0.05, Jmax25 = 230.0, E_Jmax = 30.0e3, D_Jmax = 200.0e3, 
+    C3(Sco25 = 2800.0, E_Sco = -24.46e3, Kmc25 = 270.0, E_Kmc = 80.99e3,
+        Kmo25 = 165.0e3, E_Kmo = 23.72e3, Vcmax25 = 120.0, E_Vcmax = 65.33e3,
+        simpleJ = false, k2ll = 0.35, theta = 0.7, Phi2 = 0.82, sigma2 = 0.5,
+        beta = 0.85, fcyc = 0.1,
+        fpseudo = 0.05, Jmax25 = 230.0, E_Jmax = 30.0e3, D_Jmax = 200.0e3,
         S_Jmax = 650.0, TPU25 = 12.0, E_TPU = 53.1e3, D_TPU = 20.18e3,
-        S_TPU = 650.0, Rd25 = 1.2, E_Rd = 46.39e3, gm25 = 0.4, E_gm = 49.6e3, 
-        D_gm = 437.4e3, S_gm = 1400.0, gso = 0.01, a1 = 0.85, b1 = 0.14e-3)
+        S_TPU = 650.0, Rd25 = 1.2, E_Rd = 46.39e3, gm25 = 0.4, E_gm = 49.6e3,
+        D_gm = 437.4e3, S_gm = 1400.0, gso = 0.01, a1 = 0.85, b1 = 0.14)
 
 Data structure to store all the parameters for the C3 photosynthesis model.
 
@@ -51,7 +51,7 @@ Data structure to store all the parameters for the C3 photosynthesis model.
 - `S_gm`: Entropy term for gm (K)
 - `gso`: Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s/Pa)
 - `a1`: Empirical parameter in gs formula
-- `b1`: Empirical parameter in gs formula
+- `b1`: Empirical parameter in gs formula (1/kPa)
 """
 Base.@kwdef mutable struct C3{T <: Real} <: C3Type
     # Rubisco CO2/O2 specificity
@@ -95,17 +95,17 @@ Base.@kwdef mutable struct C3{T <: Real} <: C3Type
     # Stomatal conductance
     gso::T = 0.01 # Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s)
     a1::T = 0.85 # Empirical parameter in gs formula
-    b1::T = 0.14e-3 # Empirical parameter in gs formula (1/kPa)
+    b1::T = 0.14 # Empirical parameter in gs formula (1/kPa)
 end
 
 """
     C3Q(Sco25 = 2800.0, E_Sco = -24.46e3J/mol, Kmc25 = 270.0μmol/mol, E_Kmc = 80.99e3J/mol,
          Kmo25 = 165.0e3μmol/mol, E_Kmo = 23.72e3J/mol, Vcmax25 = 120.0μmol/m^2/s, E_Vcmax = 65.33e3J/mol,
-         simpleJ = false, k2ll = 0.35, theta = 0.7, Phi2 = 0.82, sigma2 = 0.5, beta = 0.85, fcyc = 0.1, fpseudo = 0.05, 
-         Jmax25 = 230.0μmol/m^2/s, E_Jmax = 30.0e3J/mol, D_Jmax = 200.0e3J/mol, S_Jmax = 650.0J/mol/K, 
-         TPU25 = 12.0μmol/m^2/s, E_TPU = 53.1e3J/mol, D_TPU = 201.8e3J/mol, S_TPU = 650.0K, 
-         Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol, gm25 = 0.4mol/m^2/s, E_gm = 49.6e3J/mol, 
-         D_gm = 437.4e3J/mol, S_gm = 1400.0K, gso = 0.01mol/m^2/s, a1 = 0.85, b1 = 0.14e-3/Pa)
+         simpleJ = false, k2ll = 0.35, theta = 0.7, Phi2 = 0.82, sigma2 = 0.5, beta = 0.85, fcyc = 0.1, fpseudo = 0.05,
+         Jmax25 = 230.0μmol/m^2/s, E_Jmax = 30.0e3J/mol, D_Jmax = 200.0e3J/mol, S_Jmax = 650.0J/mol/K,
+         TPU25 = 12.0μmol/m^2/s, E_TPU = 53.1e3J/mol, D_TPU = 201.8e3J/mol, S_TPU = 650.0K,
+         Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol, gm25 = 0.4mol/m^2/s, E_gm = 49.6e3J/mol,
+         D_gm = 437.4e3J/mol, S_gm = 1400.0K, gso = 0.01mol/m^2/s, a1 = 0.85, b1 = 0.14/kPa)
 
 Data structure to store all the parameters for the C3 photosynthesis model using
 `Quantity` objects from Unitful.jl.
@@ -187,7 +187,7 @@ Base.@kwdef mutable struct C3Q{T <: Real} <: C3Type
     # Stomatal conductance
     gso::Quantity{T, dimension(mol / m^2 / s)} = 0.01mol / m^2 / s # Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s)
     a1::T = 0.85 # Empirical parameter in gs formula
-    b1::Quantity{T, dimension(1 / kPa)} = 0.14e-3 / Pa # Empirical parameter in gs formula (1/kPa)
+    b1::Quantity{T, dimension(1 / kPa)} = 0.14 / kPa # Empirical parameter in gs formula (1/kPa)
 end
 
 """
@@ -197,10 +197,10 @@ end
     photosynthesis(par::C4Q, PAR = 1000.0μmol/m^2/s, RH = 0.75, Tleaf = 298.0K, Ca = 400.0μmol/mol, O2 = 210e3μmol/mol, gb = 0.5mol/m^2/s, net = true)
 
 Calculate net or gross CO2 assimilation (umol/m2/s)
-and stomatal condutance to fluxes of CO2 (mol/m2/s) as a function of 
+and stomatal condutance to fluxes of CO2 (mol/m2/s) as a function of
 photosynthetically active
 radiation (PAR, umol/m2/s), relative humidity (RH), leaf temperature (Tleaf,
-K), air CO2 partial pressure (Ca, μmol/mol), oxygen (O2, μmol/mol) and boundary layer 
+K), air CO2 partial pressure (Ca, μmol/mol), oxygen (O2, μmol/mol) and boundary layer
 conductance to CO2 (gb, mol/m2/s). Environmental inputs must be scalar. The argument
 `net` indicates whether the net or gross CO2 assimilation should be returned.
 """
@@ -259,7 +259,8 @@ function photosynthesis(p::C3Type, PAR, RH, Tleaf, Ca, O2, gb, net)
     An = min(Ac, min(Aj, Ap)) # μmol/m2/s
 
     # Stomatal conductance
-    gsc = solvegs(p.gso, An, Ca, Ci_star, Rd, fvpd, gb) # mol/m2/s
+    Ci = CalcCi(p.gso, An, Ca, Ci_star, Rd, fvpd)
+    gsc = p.gso + ((An + Rd)/(Ci - Ci_star))*fvpd
 
     # Choose the right output
     A = net ? An : An + Rd
@@ -282,10 +283,10 @@ function solveAC3(gm, gb, gso, fvpd, x2, x1, gamma_star, Rd, Ca)
     A = -2 * sqrt(Q) * cos(psi / 3) - p / 3
 end
 
-# Calculate gs once A is known
-function solvegs(gso, A, Ca, Ci_star, Rd, fvpd, gb)
-    a = Ca - A / gb - Ci_star
-    b = -A - Ca * gso + gso * Ci_star - (A + Rd) * fvpd
-    c = A * gso
-    A = (-b - sqrt(b * b - 4 * a * c)) / (2 * a)
+# Calculation of internal CO2 concentration
+function CalcCi(gs0, An, Ca, Ci_star, Rd, fvpd)
+  a = gs0
+  b = An - gs0*Ca - gs0*Ci_star + (An + Rd)*fvpd
+  c = -An*Ci_star + gs0*Ca*Ci_star - (An + Rd)*Ca*fvpd
+  Ci = (-b + sqrt(b^2 - 4*a*c))/(2*a)
 end

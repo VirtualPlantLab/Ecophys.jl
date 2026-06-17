@@ -23,7 +23,7 @@ let
         O2 = O2_f,
         gb = gb_f)
     @test abs(A_f - 30.5477) < 0.0001
-    @test abs(gs_f - 0.0018) < 1e-4
+    @test abs(gs_f - 0.4114188) < 1e-4
     Ag_f, gs_f = PH.photosynthesis(c4,
         PAR = PAR_f,
         RH = RH_f,
