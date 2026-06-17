@@ -1,8 +1,8 @@
 # Ecophys release notes
 
-We started keeping track of changes in the `NEWS.md` file after version 0.1.1.
+We started keeping track of changes in the `NEWS.md` file after version 0.1.2.
 
-# Ecophys 0.1.1 (2026-06-17)
+# Ecophys 0.1.2 (2026-06-17)
 
 Bug fixes and improve test suite (output will change gs when using both C3 adn C4 models, no changes to API).
 
