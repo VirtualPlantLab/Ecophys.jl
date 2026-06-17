@@ -42,8 +42,8 @@ Tb(::Type{T}) where {T <: Real} = T(35.86)
 Tb(::Type{T}) where {T <: Quantity} = 35.86K
 
 # es(T = 35.86 K) in Murray's model
-es0(::Type{T}) where {T <: Real} = T(0.61078) # kPa
-es0(::Type{T}) where {T <: Quantity} = 0.61078kPa
+es0(::Type{T}) where {T <: Real} = T(610.78) # Pa
+es0(::Type{T}) where {T <: Quantity} = 610.78Pa
 
 # 0 umol/m2/s
 zeroflux(::Type{T}) where {T <: Real} = T(0.0) # μmol/m^2/s

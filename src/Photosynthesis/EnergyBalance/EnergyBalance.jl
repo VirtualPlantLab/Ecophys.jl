@@ -3,7 +3,7 @@
 # energybalance
 # solve_energy_balance
 
-import Roots: find_zero, Order2
+import Roots: find_zero, A42
 
 abstract type Optical end
 
@@ -40,7 +40,7 @@ Calculate the energy balance of a leaf.
 - `RH`: Relative humidity
 - `Tair`: Air temperature (K)
 - `Ca`: Atmospheric CO2 concentration (μmol/mol)
-- `P`: Air pressure (kPa)
+- `P`: Air pressure (Pa)
 - `O2`: Atmospheric O2 concentration (μmol/mol)
 
 # Details
@@ -94,12 +94,12 @@ end
                          opt = SimpleOptical(), PAR = 1000.0μmol/m^2/s,
                          NIR = 250.0W/m^2, ws = 1.0m/s, RH = 0.75,
                          Tair = 298.0K, Ca = 400.0μmol/mol, P = 101.0kPa,
-                         O2 = 210.0mmol/mol, order = Order2(), xatol = 0.01,
+                         O2 = 210.0mmol/mol, order = A42(), xatol = 0.01,
                          maxfnevals = 100, net = true)
     solve_energy_balance(Ags::Union{C3, C4}; gb = simplegb(),
                          opt = SimpleOptical(), PAR = 1000.0, NIR = 250.0,
                          ws = 1.0, RH = 0.75, Tair = 298.0, Ca = 400.0,
-                         P = 101.0e3, O2 = 210.0e3, order = Order2(), xatol = 0.01,
+                         P = 101.0e3, O2 = 210.0e3, order = A42(), xatol = 0.01,
                          maxfnevals = 100, net = true)
 
 Solve the leaf energy balance coupled to photosynthesis and transpiration.
@@ -139,7 +139,7 @@ function solve_energy_balance(Ags::Union{C3Q, C4Q}; gb = simplegbQ(),
     opt = SimpleOptical(), PAR = 1000.0μmol / m^2 / s,
     NIR = 250.0W / m^2, ws = 1.0m / s, RH = 0.75,
     Tair = 298.0K, Ca = 400.0μmol / mol, P = 101.0kPa,
-    O2 = 210.0mmol / mol, order = Order2(), xatol = 0.01,
+    O2 = 210.0mmol / mol, order = A42(), xatol = 0.01,
     maxfnevals = 100, net = true)
     solve_energy_balance(Ags, gb, opt, PAR, NIR, ws, RH, Tair, Ca, P, O2,
         order, xatol, maxfnevals, net)
@@ -147,14 +147,14 @@ end
 function solve_energy_balance(Ags::Union{C3, C4}; gb = simplegb(),
     opt = SimpleOptical(), PAR = 1000.0, NIR = 250.0,
     ws = 1.0, RH = 0.75, Tair = 298.0, Ca = 400.0,
-    P = 101.0e3, O2 = 210.0e3, order = Order2(), xatol = 0.01,
+    P = 101.0e3, O2 = 210.0e3, order = A42(), xatol = 0.01,
     maxfnevals = 100, net = true)
     solve_energy_balance(Ags, gb, opt, PAR, NIR, ws, RH, Tair, Ca, P, O2,
         order, xatol, maxfnevals, net)
 end
 
 function solve_energy_balance(pAgs, pgb, pEb, PAR, NIR, ws, RH, Tair, Ca, P, O2,
-    order = Order2(), xatol = 0.01, maxfnevals = 100, net = true)
+    order = A42(), xatol = 0.01, maxfnevals = 100, net = true)
     # Find the temperature
     Tleaf = find_zero(x -> energybalance(x,
             pgb,
@@ -168,7 +168,7 @@ function solve_energy_balance(pAgs, pgb, pEb, PAR, NIR, ws, RH, Tair, Ca, P, O2,
             Ca,
             P,
             O2),
-        (Tair - 10, Tair + 10), order, xatol = xatol, maxfnevals = maxfnevals)
+        (Tair - 10, Tair + 10), order, xatol = xatol, maxfnevals = maxfnevals, verbose = true)
     # Boundary layer conductances
     gbh, gbw, gbc = gb(pgb, ws, Tleaf, Tair, P)
     # A and gsc
@@ -192,7 +192,7 @@ function solve_energy_balance(pAgs, pgb, pEb, PAR, NIR, ws, RH, Tair, Ca, P, O2,
 end
 function solve_energy_balance(pAgs, pgb, pEb, PAR::Quantity, NIR::Quantity,
     ws::Quantity, RH, Tair::Quantity, Ca::Quantity,
-    P::Quantity, O2::Quantity, order = Order2(),
+    P::Quantity, O2::Quantity, order = A42(),
     xatol = 0.01, maxfnevals = 100, net = true)
     Tau = Tair / 1.0K
     Tleaf = find_zero(x -> energybalance(x * K,

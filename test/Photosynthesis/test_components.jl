@@ -39,7 +39,7 @@ let
     @test PH.peaked(1.0mol, 26900.0J / mol, 2e5J / mol, 650.0J / K / mol, 298.15K) == 1.0mol
 
     # Saturated vapour pressure
-    @test abs(PH.es(298.15) - 3167.69) < 0.01
+    @test abs(PH.es(298.15) - 3167.688063635486) < 0.01
     @test abs(PH.es(298.15K) - 3.16kPa) < 0.01kPa
     @test PH.es(35.86) == 0.0
     @test PH.es(35.86K) == 0.0kPa

@@ -14,7 +14,7 @@ abstract type C3Type <: FvCB end
         fpseudo = 0.05, Jmax25 = 230.0, E_Jmax = 30.0e3, D_Jmax = 200.0e3,
         S_Jmax = 650.0, TPU25 = 12.0, E_TPU = 53.1e3, D_TPU = 20.18e3,
         S_TPU = 650.0, Rd25 = 1.2, E_Rd = 46.39e3, gm25 = 0.4, E_gm = 49.6e3,
-        D_gm = 437.4e3, S_gm = 1400.0, gso = 0.01, a1 = 0.85, b1 = 0.14)
+        D_gm = 437.4e3, S_gm = 1400.0, gso = 0.01, a1 = 0.85, b1 = 0.14e-3)
 
 Data structure to store all the parameters for the C3 photosynthesis model.
 
@@ -51,7 +51,7 @@ Data structure to store all the parameters for the C3 photosynthesis model.
 - `S_gm`: Entropy term for gm (K)
 - `gso`: Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s/Pa)
 - `a1`: Empirical parameter in gs formula
-- `b1`: Empirical parameter in gs formula (1/kPa)
+- `b1`: Empirical parameter in gs formula (1/Pa)
 """
 Base.@kwdef mutable struct C3{T <: Real} <: C3Type
     # Rubisco CO2/O2 specificity
@@ -95,7 +95,7 @@ Base.@kwdef mutable struct C3{T <: Real} <: C3Type
     # Stomatal conductance
     gso::T = 0.01 # Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s)
     a1::T = 0.85 # Empirical parameter in gs formula
-    b1::T = 0.14 # Empirical parameter in gs formula (1/kPa)
+    b1::T = 0.14e-3 # Empirical parameter in gs formula (1/Pa)
 end
 
 """
@@ -105,7 +105,7 @@ end
          Jmax25 = 230.0μmol/m^2/s, E_Jmax = 30.0e3J/mol, D_Jmax = 200.0e3J/mol, S_Jmax = 650.0J/mol/K,
          TPU25 = 12.0μmol/m^2/s, E_TPU = 53.1e3J/mol, D_TPU = 201.8e3J/mol, S_TPU = 650.0K,
          Rd25 = 1.2μmol/m^2/s, E_Rd = 46.39e3J/mol, gm25 = 0.4mol/m^2/s, E_gm = 49.6e3J/mol,
-         D_gm = 437.4e3J/mol, S_gm = 1400.0K, gso = 0.01mol/m^2/s, a1 = 0.85, b1 = 0.14/kPa)
+         D_gm = 437.4e3J/mol, S_gm = 1400.0K, gso = 0.01mol/m^2/s, a1 = 0.85, b1 = 0.14e-3/Pa)
 
 Data structure to store all the parameters for the C3 photosynthesis model using
 `Quantity` objects from Unitful.jl.
@@ -143,7 +143,7 @@ Data structure to store all the parameters for the C3 photosynthesis model using
 - `S_gm`: Entropy term for gm (J/K/mol)
 - `gso`: Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s)
 - `a1`: Empirical parameter in gs formula
-- `b1`: Empirical parameter in gs formula (1/kPa)
+- `b1`: Empirical parameter in gs formula (1/Pa)
 """
 Base.@kwdef mutable struct C3Q{T <: Real} <: C3Type
     # Rubisco CO2/O2 specificity
@@ -187,7 +187,7 @@ Base.@kwdef mutable struct C3Q{T <: Real} <: C3Type
     # Stomatal conductance
     gso::Quantity{T, dimension(mol / m^2 / s)} = 0.01mol / m^2 / s # Minimum stomatal conductance to fluxes of CO2 in darkness (mol/m2/s)
     a1::T = 0.85 # Empirical parameter in gs formula
-    b1::Quantity{T, dimension(1 / kPa)} = 0.14 / kPa # Empirical parameter in gs formula (1/kPa)
+    b1::Quantity{T, dimension(1 / Pa)} = 0.14e-3 / Pa # Empirical parameter in gs formula (1/Pa)
 end
 
 """
