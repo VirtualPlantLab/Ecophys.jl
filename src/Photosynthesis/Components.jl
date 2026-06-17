@@ -42,7 +42,7 @@ Tb(::Type{T}) where {T <: Real} = T(35.86)
 Tb(::Type{T}) where {T <: Quantity} = 35.86K
 
 # es(T = 35.86 K) in Murray's model
-es0(::Type{T}) where {T <: Real} = T(610.78)
+es0(::Type{T}) where {T <: Real} = T(610.78) # Pa
 es0(::Type{T}) where {T <: Quantity} = 610.78Pa
 
 # 0 umol/m2/s
@@ -126,7 +126,7 @@ function ThermalDiffusivity(Tavg::T) where {T <: Quantity}
     (0.0001Tavg * Tavg / K^2 + 0.0561 * Tavg / K - 6.1952) * 1e-6m^2 / s # m^2/s
 end
 
-# Molar volume 
+# Molar volume
 MolarVolume(Tavg, P) = GasConstant(typeof(Tavg)) * Tavg / P
 
 # Air density

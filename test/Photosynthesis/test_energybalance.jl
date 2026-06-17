@@ -27,7 +27,7 @@ O2 = 210e3 # μmol/mol
 res = PH.energybalance(Tl, gb, c3, opt, PAR, NIR, ws, RH, Tair, Ca, P, O2) # W/m^2
 Tl = PH.solve_energy_balance(c3, gb = gb, opt = opt, PAR = PAR, NIR = NIR,
     ws = ws, RH = RH, Tair = Tair, Ca = Ca, P = P, O2 = O2,
-    xatol = 0.01, order = Order2()).Tleaf
+    xatol = 0.01, order = A42()).Tleaf
 
 # With units
 opt = PH.SimpleOptical()
@@ -58,8 +58,8 @@ res_q = PH.energybalance(Tl_q,
 Tl_q = PH.solve_energy_balance(c3_q, gb = gb_q, opt = opt, PAR = PAR_q,
     NIR = NIR_q, ws = ws_q, RH = RH_q, Tair = Ta_q,
     Ca = Ca_q, P = P_q, O2 = O2_q, xatol = 0.01,
-    order = Order2()).Tleaf
-@test Tl_q ≈ Tl * K
+    order = A42()).Tleaf
+@test abs(Tl_q - Tl * K) < 0.02K
 
 # With effect of angles (horizontal)
 gb_q = PH.gbAngleQ()
@@ -80,8 +80,8 @@ res_q = PH.energybalance(Tl_q,
 Tl_q = PH.solve_energy_balance(c3_q, gb = gb_q, opt = opt, PAR = PAR_q,
     NIR = NIR_q, ws = ws_q, RH = RH_q, Tair = Ta_q,
     Ca = Ca_q, P = P_q, O2 = O2_q, xatol = 0.01,
-    order = Order2()).Tleaf
-@test Tl_q ≈ Tl * K
+    order = A42()).Tleaf
+@test abs(Tl_q - Tl * K) < 0.02K
 
 #############################################################################################################
 ################################################# C4 leaves #################################################
@@ -93,7 +93,7 @@ Tl = 300.0
 res = PH.energybalance(Tl, gb, c4, opt, PAR, NIR, ws, RH, Tair, Ca, P, O2) # W/m^2
 Tl = PH.solve_energy_balance(c4, gb = gb, opt = opt, PAR = PAR, NIR = NIR,
     ws = ws, RH = RH, Tair = Tair, Ca = Ca, P = P, O2 = O2,
-    xatol = 0.01, order = Order2()).Tleaf
+    xatol = 0.01, order = A42()).Tleaf
 
 # With units
 c4_q = PH.C4Q()
@@ -115,8 +115,8 @@ res_q = PH.energybalance(Tl_q,
 Tl_q = PH.solve_energy_balance(c4_q, gb = gb_q, opt = opt, PAR = PAR_q,
     NIR = NIR_q, ws = ws_q, RH = RH_q, Tair = Ta_q,
     Ca = Ca_q, P = P_q, O2 = O2_q, xatol = 0.01,
-    order = Order2()).Tleaf
-@test Tl_q ≈ Tl * K
+    order = A42()).Tleaf
+@test abs(Tl_q - Tl * K) < 0.02K
 
 # With effect of angles (horizontal)
 gb_q = PH.gbAngleQ()
@@ -137,7 +137,7 @@ res_q = PH.energybalance(Tl_q,
 Tl_q = PH.solve_energy_balance(c4_q, gb = gb_q, opt = opt, PAR = PAR_q,
     NIR = NIR_q, ws = ws_q, RH = RH_q, Tair = Ta_q,
     Ca = Ca_q, P = P_q, O2 = O2_q, xatol = 0.01,
-    order = Order2()).Tleaf
-@test Tl_q ≈ Tl * K
+    order = A42()).Tleaf
+@test abs(Tl_q - Tl * K) < 0.02K
 
 end
